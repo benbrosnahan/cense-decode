@@ -38,4 +38,4 @@ cp .env.example .env.local   # add ANTHROPIC_API_KEY
 npm run dev
 ```
 
-Built with Claude Code. Part of [Cense](https://cense.beehiiv.com).
+Part of [Cense](https://cense.beehiiv.com).
