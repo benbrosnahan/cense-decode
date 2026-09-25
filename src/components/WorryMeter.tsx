@@ -73,11 +73,13 @@ export default function WorryMeter({ worry }: Props) {
       )}
 
       {cues.length > 0 && (
+        // Reasons arrive mid-stream; open them smoothly so the text below
+        // slides down instead of jumping while someone is reading it.
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.2 }}
-          className="mt-4"
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+          transition={{ duration: 0.45, ease: "easeInOut" }}
+          className="mt-4 overflow-hidden"
         >
           <p className="text-xs font-medium text-foreground/50 uppercase tracking-wide">
             Why we say this
