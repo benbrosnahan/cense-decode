@@ -143,6 +143,7 @@ export async function POST(request: Request) {
 
   const client = new Anthropic({ apiKey });
   let modelStream: ReturnType<typeof client.messages.stream> | null = null;
+  let clientGone = false;
 
   const body = new ReadableStream<Uint8Array>({
     async start(controller) {
@@ -243,7 +244,8 @@ export async function POST(request: Request) {
           final = normalizeResult(toolUse.input, sourceText);
         }
       } catch (err) {
-        if (open) console.error("decode error:", err);
+        // A client disconnect aborts the model stream; that is not an error.
+        if (!clientGone) console.error("decode error:", err);
       }
 
       send({ type: "final", data: final });
@@ -258,6 +260,7 @@ export async function POST(request: Request) {
     },
     cancel() {
       // The browser disconnected: stop paying for tokens nobody will read.
+      clientGone = true;
       modelStream?.abort();
     },
   });
