@@ -2,9 +2,15 @@
 
 import { motion } from "framer-motion";
 import { WorryRead, WorryLevel } from "@/types";
+import { SkeletonLine } from "@/components/ui/skeleton";
 
 interface Props {
-  worry: WorryRead;
+  /**
+   * Absent while the decode is still streaming. The server only sends the
+   * worry read once it is complete and scam-clamped, so until then this card
+   * shows placeholders and never a provisional level.
+   */
+  worry?: WorryRead;
 }
 
 // Neutral wording only. We deliberately avoid color-coding urgency so the card
@@ -17,9 +23,9 @@ const LEVEL_WORD: Record<WorryLevel, string> = {
 };
 
 export default function WorryMeter({ worry }: Props) {
-  const level: WorryLevel = (["green", "yellow", "red"] as WorryLevel[]).includes(
-    worry?.level
-  )
+  const pending = !worry;
+  const level: WorryLevel = worry &&
+    (["green", "yellow", "red"] as WorryLevel[]).includes(worry.level)
     ? worry.level
     : "yellow";
   const cues = worry?.basedOn ?? [];
@@ -35,17 +41,44 @@ export default function WorryMeter({ worry }: Props) {
         <p className="text-xs font-medium text-foreground/50 uppercase tracking-wide">
           Level of urgency
         </p>
-        <span className="text-xs font-medium text-muted-foreground rounded-full bg-muted px-2.5 py-1">
-          {LEVEL_WORD[level]}
-        </span>
+        {pending ? (
+          <SkeletonLine className="h-6 w-20" />
+        ) : (
+          <motion.span
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.2 }}
+            className="text-xs font-medium text-muted-foreground rounded-full bg-muted px-2.5 py-1"
+          >
+            {LEVEL_WORD[level]}
+          </motion.span>
+        )}
       </div>
 
-      <p className="mt-3 text-base font-medium text-foreground leading-snug">
-        {worry?.headline}
-      </p>
+      {pending ? (
+        <div className="mt-3 flex flex-col gap-2 py-1">
+          <span className="sr-only">Checking how urgent this is.</span>
+          <SkeletonLine className="h-3.5 w-4/5" />
+          <SkeletonLine className="h-3.5 w-1/2" />
+        </div>
+      ) : (
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.2 }}
+          className="mt-3 text-base font-medium text-foreground leading-snug"
+        >
+          {worry?.headline}
+        </motion.p>
+      )}
 
       {cues.length > 0 && (
-        <div className="mt-4">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.2 }}
+          className="mt-4"
+        >
           <p className="text-xs font-medium text-foreground/50 uppercase tracking-wide">
             Why we say this
           </p>
@@ -57,7 +90,7 @@ export default function WorryMeter({ worry }: Props) {
               </li>
             ))}
           </ul>
-        </div>
+        </motion.div>
       )}
     </motion.div>
   );

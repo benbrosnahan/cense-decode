@@ -1,13 +1,17 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { SkeletonLine } from "@/components/ui/skeleton";
 
 interface Props {
-  nextStep: string;
+  /** Empty or absent while it is still on its way. */
+  nextStep?: string;
   considerations?: string[];
+  /** True while the decode is still streaming in. */
+  streaming?: boolean;
 }
 
-export default function NextStepCard({ nextStep, considerations }: Props) {
+export default function NextStepCard({ nextStep, considerations, streaming }: Props) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -31,11 +35,20 @@ export default function NextStepCard({ nextStep, considerations }: Props) {
             />
           </svg>
         </div>
-        <div>
+        <div className="flex-1 min-w-0">
           <p className="text-sm font-medium text-foreground">Your next step</p>
-          <p className="mt-0.5 text-sm text-foreground/75 leading-relaxed">
-            {nextStep}
-          </p>
+          {nextStep ? (
+            <p className="mt-0.5 text-sm text-foreground/75 leading-relaxed">
+              {nextStep}
+            </p>
+          ) : (
+            streaming && (
+              <div className="mt-0.5 flex flex-col gap-[10px] py-[5px]">
+                <SkeletonLine className="w-11/12" />
+                <SkeletonLine className="w-1/2" />
+              </div>
+            )
+          )}
         </div>
       </div>
 

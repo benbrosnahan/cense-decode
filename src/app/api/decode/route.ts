@@ -1,8 +1,13 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { SYSTEM_PROMPT, DECODE_TOOL_SCHEMA } from "@/lib/prompt";
 import { getFallbackDecode } from "@/lib/fallback";
-import { DecodeResult, WorryLevel, Topic } from "@/types";
-import { ROUTE_TARGETS, TOPIC_TO_ROUTE } from "@/lib/routes";
+import { buildPartial, normalizeResult } from "@/lib/normalize";
+import { parsePartialObject } from "@/lib/partialJson";
+import { DecodeResult, DecodeStreamEvent } from "@/types";
+
+export const runtime = "nodejs";
+// Decodes typically finish in 10-20s; leave headroom for long screenshots.
+export const maxDuration = 60;
 
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 const RATE_LIMIT = 5;
@@ -12,11 +17,26 @@ const MODEL = process.env.DECODE_MODEL || "claude-opus-4-8";
 const MAX_TEXT_CHARS = 4000;
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024; // ~5 MB decoded
 const ALLOWED_MEDIA = new Set(["image/png", "image/jpeg", "image/webp"]);
+/** Minimum gap between partial events, so the client is not flooded. */
+const PARTIAL_THROTTLE_MS = 80;
 
-// Cues that should never be served as "green". Belt-and-suspenders on top of
-// the system prompt's red-flag override.
-const SCAM_PATTERNS =
-  /\b(urgent|immediately|verify your account|claim your refund|wire|gift card|suspended|act now|final notice|wire transfer|routing number|social security|password|crypto|guaranteed returns?)\b/i;
+const NDJSON_HEADERS = {
+  "Content-Type": "application/x-ndjson; charset=utf-8",
+  "Cache-Control": "no-cache, no-transform",
+  "X-Accel-Buffering": "no",
+};
+
+function eventLine(event: DecodeStreamEvent): string {
+  return JSON.stringify(event) + "\n";
+}
+
+/** A complete NDJSON response holding nothing but a final event. */
+function finalOnly(result: DecodeResult): Response {
+  return new Response(eventLine({ type: "final", data: result }), {
+    status: 200,
+    headers: NDJSON_HEADERS,
+  });
+}
 
 function isRateLimited(ip: string): boolean {
   const now = Date.now();
@@ -38,67 +58,14 @@ function sanitizeText(str: unknown): string {
   return str.slice(0, MAX_TEXT_CHARS).trim();
 }
 
-const VALID_LEVELS: WorryLevel[] = ["green", "yellow", "red"];
-
-// Neutral, level-appropriate headlines used only when the model omits one.
-// (The fallback's "we could not analyze this" text is for total failures and
-// must never leak onto a result that was actually analyzed.)
-const DEFAULT_HEADLINES: Record<WorryLevel, string> = {
-  green: "There is nothing here you need to act on right now.",
-  yellow: "Worth understanding, but nothing here is urgent.",
-  red: "Slow down and verify this before doing anything.",
-};
-
 /**
- * Normalize the model output into a guaranteed-valid DecodeResult shape so the
- * UI can never crash on a missing field or an out-of-enum worry level, then
- * apply the scam clamp (never downgrade worry; force at least yellow on scam
- * wording).
+ * POST /api/decode
+ *
+ * Streams NDJSON: zero or more {"type":"partial"} lines while the model writes
+ * the decode, then exactly one {"type":"final"} line holding the normalized
+ * DecodeResult (or the safe fallback on any failure). Input errors (400/413)
+ * and rate limiting (429) are plain JSON with a non-2xx status.
  */
-function normalizeResult(raw: unknown, sourceText: string): DecodeResult {
-  const r = (raw ?? {}) as Partial<DecodeResult>;
-  const fallback = getFallbackDecode();
-
-  const rawLevel = String(r.worry?.level ?? "").toLowerCase() as WorryLevel;
-  let level: WorryLevel = VALID_LEVELS.includes(rawLevel) ? rawLevel : "yellow";
-  const basedOn = Array.isArray(r.worry?.basedOn) ? r.worry!.basedOn : [];
-
-  // Scam clamp: never serve scammy wording as "green".
-  if (SCAM_PATTERNS.test(sourceText) && level === "green") {
-    level = "yellow";
-    basedOn.push(
-      "Contains wording often seen in scams or urgent money requests."
-    );
-  }
-
-  const considerations = Array.isArray(r.considerations)
-    ? r.considerations.filter((c) => typeof c === "string" && c.trim()).slice(0, 3)
-    : [];
-
-  // Derive the deeper-tool suggestion deterministically from the model's topic
-  // classification (a required enum, far more reliable than an optional object).
-  const topic = (r as { topic?: Topic }).topic;
-  const route = topic ? TOPIC_TO_ROUTE[topic] : null;
-  const goDeeper = route
-    ? { route, label: ROUTE_TARGETS[route].defaultLabel }
-    : undefined;
-
-  return {
-    plainLanguage: r.plainLanguage || fallback.plainLanguage,
-    analogy: r.analogy || fallback.analogy,
-    worry: {
-      level,
-      headline: r.worry?.headline || DEFAULT_HEADLINES[level],
-      basedOn,
-    },
-    jargon: Array.isArray(r.jargon) ? r.jargon : [],
-    nextStep: r.nextStep || fallback.nextStep,
-    considerations: considerations.length > 0 ? considerations : undefined,
-    goDeeper,
-    disclaimer: r.disclaimer || fallback.disclaimer,
-  };
-}
-
 export async function POST(request: Request) {
   const ip =
     request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
@@ -115,16 +82,15 @@ export async function POST(request: Request) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
     // No key configured: return a safe fallback rather than crashing the UI.
-    return Response.json(getFallbackDecode(), { status: 200 });
+    return finalOnly(getFallbackDecode());
   }
 
   let sourceText = "";
+  const content: Anthropic.ContentBlockParam[] = [];
 
   try {
     const body = await request.json();
     const mode = body?.mode === "image" ? "image" : "text";
-
-    const content: Anthropic.ContentBlockParam[] = [];
 
     if (mode === "image") {
       const image = body?.image;
@@ -170,47 +136,131 @@ export async function POST(request: Request) {
       }
       content.push({ type: "text", text: sourceText });
     }
-
-    const client = new Anthropic({ apiKey });
-
-    const response = await client.messages.create({
-      model: MODEL,
-      // Generous headroom: a full decode (verbose plainLanguage + analogy +
-      // 6-7 jargon defs + considerations) can run ~1.5k tokens, and content-rich
-      // screenshots push higher. 2000 truncated mid-JSON and dropped the later
-      // fields (jargon, nextStep, topic). 4096 leaves comfortable room.
-      max_tokens: 4096,
-      system: SYSTEM_PROMPT,
-      tools: [
-        {
-          name: "decode",
-          description:
-            "Return the calm, plain-language decode of the student's input.",
-          input_schema: DECODE_TOOL_SCHEMA,
-          // strict: true enforces the schema's `required` fields, so the model
-          // can never omit jargon/nextStep/topic (it intermittently did without).
-          strict: true,
-        },
-      ],
-      tool_choice: { type: "tool", name: "decode" },
-      messages: [{ role: "user", content }],
-    });
-
-    if (response.stop_reason === "max_tokens") {
-      // The tool JSON was cut off, so later fields are missing and would fall
-      // back to placeholders. Surface it rather than silently degrading.
-      console.warn("decode: response hit max_tokens, output may be truncated");
-    }
-
-    const toolUse = response.content.find((b) => b.type === "tool_use");
-    if (!toolUse || toolUse.type !== "tool_use") {
-      return Response.json(getFallbackDecode(), { status: 200 });
-    }
-
-    const result = normalizeResult(toolUse.input, sourceText);
-    return Response.json(result, { status: 200 });
   } catch (err) {
     console.error("decode error:", err);
-    return Response.json(getFallbackDecode(), { status: 200 });
+    return finalOnly(getFallbackDecode());
   }
+
+  const client = new Anthropic({ apiKey });
+  let modelStream: ReturnType<typeof client.messages.stream> | null = null;
+
+  const body = new ReadableStream<Uint8Array>({
+    async start(controller) {
+      const encoder = new TextEncoder();
+      let open = true;
+      const send = (event: DecodeStreamEvent) => {
+        if (!open) return;
+        try {
+          controller.enqueue(encoder.encode(eventLine(event)));
+        } catch {
+          open = false; // client went away
+        }
+      };
+
+      let final: DecodeResult = getFallbackDecode();
+
+      try {
+        const stream = client.messages.stream({
+          model: MODEL,
+          // Generous headroom: a full decode (verbose plainLanguage + analogy +
+          // 6-7 jargon defs + considerations) can run ~1.5k tokens, and
+          // content-rich screenshots push higher. 2000 truncated mid-JSON and
+          // dropped the later fields (jargon, nextStep, topic). 4096 leaves
+          // comfortable room.
+          max_tokens: 4096,
+          system: SYSTEM_PROMPT,
+          tools: [
+            {
+              name: "decode",
+              description:
+                "Return the calm, plain-language decode of the student's input.",
+              input_schema: DECODE_TOOL_SCHEMA,
+              // strict: true enforces the schema's `required` fields, so the
+              // model can never omit jargon/nextStep/topic (it intermittently
+              // did without).
+              strict: true,
+              // Stream the tool input as it is generated instead of in one
+              // burst at the end. The API no longer validates it for us, so
+              // the finished input still goes through normalizeResult.
+              eager_input_streaming: true,
+            },
+          ],
+          tool_choice: { type: "tool", name: "decode" },
+          messages: [{ role: "user", content }],
+        });
+        modelStream = stream;
+
+        let toolIndex = -1;
+        let json = "";
+        let lastSentAt = 0;
+        let lastPayload = "";
+
+        for await (const event of stream) {
+          if (
+            event.type === "content_block_start" &&
+            event.content_block.type === "tool_use" &&
+            event.content_block.name === "decode"
+          ) {
+            toolIndex = event.index;
+            continue;
+          }
+          if (
+            event.type !== "content_block_delta" ||
+            event.index !== toolIndex ||
+            event.delta.type !== "input_json_delta"
+          ) {
+            continue;
+          }
+
+          json += event.delta.partial_json;
+          const now = Date.now();
+          if (now - lastSentAt < PARTIAL_THROTTLE_MS) continue;
+
+          const data = buildPartial(parsePartialObject(json), sourceText);
+          if (Object.keys(data).length === 0) continue;
+          const payload = JSON.stringify(data);
+          if (payload === lastPayload) continue;
+
+          lastPayload = payload;
+          lastSentAt = now;
+          send({ type: "partial", data });
+        }
+
+        const message = await stream.finalMessage();
+
+        if (message.stop_reason === "max_tokens") {
+          // The tool JSON was cut off, so later fields are missing and would
+          // fall back to placeholders. Surface it rather than silently
+          // degrading.
+          console.warn("decode: response hit max_tokens, output may be truncated");
+        }
+
+        const toolUse = message.content.find((b) => b.type === "tool_use");
+        if (message.stop_reason === "refusal") {
+          // A refusal can cut the tool input off mid-way; do not trust it.
+          console.warn("decode: model refused, serving fallback");
+        } else if (toolUse && toolUse.type === "tool_use") {
+          final = normalizeResult(toolUse.input, sourceText);
+        }
+      } catch (err) {
+        if (open) console.error("decode error:", err);
+      }
+
+      send({ type: "final", data: final });
+      if (open) {
+        open = false;
+        try {
+          controller.close();
+        } catch {
+          // already closed
+        }
+      }
+    },
+    cancel() {
+      // The browser disconnected: stop paying for tokens nobody will read.
+      modelStream?.abort();
+    },
+  });
+
+  return new Response(body, { status: 200, headers: NDJSON_HEADERS });
 }

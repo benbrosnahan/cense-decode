@@ -72,3 +72,26 @@ export interface DecodeRequest {
     dataBase64: string;
   };
 }
+
+/**
+ * A decode that is still streaming in. Every field is optional and may be
+ * mid-sentence. `worry` only appears once the model has finished writing it
+ * and the scam clamp has been applied; `goDeeper` and `disclaimer` only ever
+ * come with the final result.
+ */
+export interface PartialDecode {
+  plainLanguage?: string;
+  analogy?: string;
+  worry?: WorryRead;
+  jargon?: JargonTerm[];
+  nextStep?: string;
+  considerations?: string[];
+}
+
+/**
+ * One line of the POST /api/decode NDJSON response. Zero or more "partial"
+ * events are followed by exactly one "final" event.
+ */
+export type DecodeStreamEvent =
+  | { type: "partial"; data: PartialDecode }
+  | { type: "final"; data: DecodeResult };

@@ -2,13 +2,18 @@
 
 import { motion } from "framer-motion";
 import { JargonTerm } from "@/types";
+import { SkeletonLine } from "@/components/ui/skeleton";
 
 interface Props {
-  jargon: JargonTerm[];
+  /** Absent while the terms have not started streaming in yet. */
+  jargon?: JargonTerm[];
+  /** True while the decode is still streaming in. */
+  streaming?: boolean;
 }
 
-export default function JargonDecoder({ jargon }: Props) {
-  if (jargon.length === 0) return null;
+export default function JargonDecoder({ jargon, streaming }: Props) {
+  if (jargon && jargon.length === 0) return null;
+  if (!jargon && !streaming) return null;
 
   return (
     <motion.div
@@ -21,14 +26,30 @@ export default function JargonDecoder({ jargon }: Props) {
         Words decoded
       </p>
       <dl className="mt-3 flex flex-col divide-y divide-border/70">
-        {jargon.map((j) => (
-          <div key={j.term} className="py-2.5 first:pt-0 last:pb-0">
-            <dt className="text-sm font-semibold text-foreground">{j.term}</dt>
-            <dd className="mt-0.5 text-sm text-foreground/70 leading-relaxed">
-              {j.definition}
-            </dd>
-          </div>
-        ))}
+        {jargon
+          ? jargon.map((j, i) => (
+              // Index keys: a term's text grows while it streams in.
+              <div key={i} className="py-2.5 first:pt-0 last:pb-0">
+                <dt className="text-sm font-semibold text-foreground">{j.term}</dt>
+                <dd className="mt-0.5 text-sm text-foreground/70 leading-relaxed">
+                  {j.definition || (streaming && (
+                    <span className="block py-[5px]">
+                      <SkeletonLine className="w-3/4" />
+                    </span>
+                  ))}
+                </dd>
+              </div>
+            ))
+          : [0, 1].map((i) => (
+              <div key={i} className="py-2.5 first:pt-0 last:pb-0" aria-hidden>
+                <div className="py-[4px]">
+                  <SkeletonLine className="w-24" />
+                </div>
+                <div className="mt-0.5 py-[5px]">
+                  <SkeletonLine className="w-3/4" />
+                </div>
+              </div>
+            ))}
       </dl>
     </motion.div>
   );

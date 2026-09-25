@@ -1,40 +1,103 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import InputScreen from "@/components/InputScreen";
 import LoadingScreen from "@/components/LoadingScreen";
 import ResultsScreen from "@/components/ResultsScreen";
-import { AppView, DecodeRequest, DecodeResult } from "@/types";
+import {
+  AppView,
+  DecodeRequest,
+  DecodeResult,
+  DecodeStreamEvent,
+  PartialDecode,
+} from "@/types";
 import { getFallbackDecode } from "@/lib/fallback";
 
 export default function Home() {
   const [view, setView] = useState<AppView>("input");
-  const [result, setResult] = useState<DecodeResult | null>(null);
+  // While streaming this holds the latest partial; once the final event lands
+  // it holds the full, normalized DecodeResult.
+  const [result, setResult] = useState<PartialDecode | DecodeResult | null>(null);
+  const [isFinal, setIsFinal] = useState(false);
+  const abortRef = useRef<AbortController | null>(null);
 
   const handleSubmit = useCallback(async (req: DecodeRequest) => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
+    setResult(null);
+    setIsFinal(false);
     setView("loading");
     window.scrollTo({ top: 0, behavior: "smooth" });
+
+    const finish = (final: DecodeResult) => {
+      if (controller.signal.aborted) return;
+      setResult(final);
+      setIsFinal(true);
+      setView("results");
+    };
+
+    let gotFinal = false;
+    const handleLine = (line: string) => {
+      if (!line.trim() || gotFinal) return;
+      let event: DecodeStreamEvent;
+      try {
+        event = JSON.parse(line) as DecodeStreamEvent;
+      } catch {
+        return; // ignore a malformed line; the final event still decides
+      }
+      if (event.type === "final") {
+        gotFinal = true;
+        finish(event.data);
+      } else if (event.type === "partial" && !controller.signal.aborted) {
+        setResult(event.data);
+        // Leave the loading screen as soon as there is something to read.
+        if (event.data.plainLanguage?.trim()) setView("results");
+      }
+    };
+
     try {
       const res = await fetch("/api/decode", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(req),
+        signal: controller.signal,
       });
-      if (!res.ok) {
+      if (!res.ok || !res.body) {
         // 429 and other handled errors still return JSON; show a safe result.
-        setResult(getFallbackDecode());
-      } else {
-        setResult((await res.json()) as DecodeResult);
+        finish(getFallbackDecode());
+        return;
       }
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      for (;;) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() ?? "";
+        lines.forEach(handleLine);
+      }
+      buffer += decoder.decode();
+      handleLine(buffer);
+
+      // The stream ended without a final event: never leave a half-written
+      // (and worry-less) result on screen.
+      if (!gotFinal) finish(getFallbackDecode());
     } catch {
-      setResult(getFallbackDecode());
+      if (!gotFinal) finish(getFallbackDecode());
     }
-    setView("results");
   }, []);
 
   const handleDecodeAnother = useCallback(() => {
+    abortRef.current?.abort();
+    abortRef.current = null;
     setResult(null);
+    setIsFinal(false);
     setView("input");
   }, []);
 
@@ -76,6 +139,7 @@ export default function Home() {
             >
               <ResultsScreen
                 result={result}
+                isFinal={isFinal}
                 onDecodeAnother={handleDecodeAnother}
               />
             </motion.div>

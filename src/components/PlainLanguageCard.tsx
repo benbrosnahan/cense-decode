@@ -1,13 +1,17 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { SkeletonLine } from "@/components/ui/skeleton";
 
 interface Props {
   plainLanguage: string;
-  analogy: string;
+  /** Empty or absent while the analogy is still on its way. */
+  analogy?: string;
+  /** True while the decode is still streaming in. */
+  streaming?: boolean;
 }
 
-export default function PlainLanguageCard({ plainLanguage, analogy }: Props) {
+export default function PlainLanguageCard({ plainLanguage, analogy, streaming }: Props) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -21,9 +25,17 @@ export default function PlainLanguageCard({ plainLanguage, analogy }: Props) {
       <p className="mt-2 text-sm text-foreground/85 leading-relaxed">
         {plainLanguage}
       </p>
-      <p className="mt-3 text-sm text-foreground/70 leading-relaxed italic">
-        {analogy}
-      </p>
+      {analogy ? (
+        <p className="mt-3 text-sm text-foreground/70 leading-relaxed italic">
+          {analogy}
+        </p>
+      ) : (
+        streaming && (
+          <div className="mt-3 py-[5px]">
+            <SkeletonLine className="w-2/3" />
+          </div>
+        )
+      )}
     </motion.div>
   );
 }
