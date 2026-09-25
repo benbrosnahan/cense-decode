@@ -108,7 +108,7 @@ export default function InputScreen({ onSubmit }: Props) {
             </span>
             <button
               onClick={() => setImage(null)}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-2 -my-2"
             >
               Remove
             </button>
@@ -126,7 +126,16 @@ export default function InputScreen({ onSubmit }: Props) {
               handleFile(e.dataTransfer.files?.[0]);
             }}
             onClick={() => fileInputRef.current?.click()}
-            className={`flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed p-4 text-sm transition-colors ${
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                fileInputRef.current?.click();
+              }
+            }}
+            role="button"
+            tabIndex={0}
+            aria-label="Add a screenshot to decode"
+            className={`flex cursor-pointer outline-none focus-visible:ring-3 focus-visible:ring-ring/50 items-center justify-center gap-2 rounded-xl border border-dashed p-4 text-sm transition-colors ${
               dragOver
                 ? "border-ring bg-accent/60 text-foreground"
                 : "border-input text-muted-foreground hover:bg-accent/40"
@@ -145,7 +154,7 @@ export default function InputScreen({ onSubmit }: Props) {
                 d="M3 16.5V18a2 2 0 002 2h14a2 2 0 002-2v-1.5M7.5 9L12 4.5 16.5 9M12 4.5V15"
               />
             </svg>
-            Drop a screenshot, or click to upload
+            Drop a screenshot, or choose one to upload
             <input
               ref={fileInputRef}
               type="file"

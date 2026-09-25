@@ -12,10 +12,11 @@ export const TOPIC_TO_ROUTE: Record<Topic, RouteKey | null> = {
 };
 
 /**
- * Maps each "go deeper" route to its deployed Cense tool. URLs use the
- * <project>.vercel.app convention — VERIFY/REPLACE each with the real
- * production URL (custom domain etc.). A route with url: null renders no CTA,
- * so the topic is still classified but no broken link appears.
+ * Maps each "go deeper" route to its deployed Cense tool. *.vercel.app is a
+ * global namespace and several bare names belong to strangers (worth-it,
+ * offer-lab), so every URL here was verified by page title. A route with
+ * url: null renders no CTA, so the topic is still classified but no broken
+ * link appears.
  */
 export const ROUTE_TARGETS: Record<
   RouteKey,
@@ -26,12 +27,13 @@ export const ROUTE_TARGETS: Record<
     defaultLabel: "See if you're ready to start investing",
   },
   "offer-lab": {
-    url: "https://offer-lab.vercel.app",
-    defaultLabel: "Compare your job offers side by side",
+    url: "https://offer-lab-ivory.vercel.app",
+    defaultLabel: "See what your job offer is worth where you'd live",
   },
   "loan-lab": {
-    url: "https://loan-lab.vercel.app",
-    defaultLabel: "Find your best student loan repayment plan",
+    // Loan Desk supersedes Loan Lab (see loan-lab's README).
+    url: "https://cense-loan-desk.vercel.app",
+    defaultLabel: "See every loan and the repayment plans you qualify for",
   },
   "cc-recommender": {
     // cc-recommender's Vercel project is named "cense".
@@ -39,7 +41,7 @@ export const ROUTE_TARGETS: Record<
     defaultLabel: "Find the credit card that fits you",
   },
   "worth-it": {
-    url: "https://worth-it.vercel.app",
+    url: "https://worth-it-omega.vercel.app",
     defaultLabel: "Check if this purchase is worth it",
   },
   "web-app": {

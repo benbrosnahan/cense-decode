@@ -17,6 +17,14 @@ export const metadata: Metadata = {
   title: "Decode by Cense",
   description:
     "Paste or screenshot anything money-related that confuses or stresses you. Get a calm, plain-language explanation, whether you should worry, and one next step.",
+  openGraph: {
+    title: "Decode by Cense",
+    description:
+      "Paste or screenshot anything money-related that confuses you. Get a calm, plain-language explanation and one next step.",
+    url: "https://cense-decode.vercel.app",
+    siteName: "Cense",
+    type: "website",
+  },
 };
 
 export default function RootLayout({

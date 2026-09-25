@@ -12,7 +12,7 @@ import {
   DecodeStreamEvent,
   PartialDecode,
 } from "@/types";
-import { getFallbackDecode } from "@/lib/fallback";
+import { getFallbackDecode, getRateLimitedDecode } from "@/lib/fallback";
 
 export default function Home() {
   const [view, setView] = useState<AppView>("input");
@@ -66,8 +66,9 @@ export default function Home() {
         signal: controller.signal,
       });
       if (!res.ok || !res.body) {
-        // 429 and other handled errors still return JSON; show a safe result.
-        finish(getFallbackDecode());
+        // 429 and other handled errors still return JSON; show a safe result
+        // that says what actually happened.
+        finish(res.status === 429 ? getRateLimitedDecode() : getFallbackDecode());
         return;
       }
 
@@ -99,6 +100,7 @@ export default function Home() {
     setResult(null);
     setIsFinal(false);
     setView("input");
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
   return (
