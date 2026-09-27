@@ -10,9 +10,29 @@ export function SkeletonLine({ className }: { className?: string }) {
     <span
       aria-hidden
       className={cn(
-        "block h-3 rounded-full bg-foreground/[0.07] motion-safe:animate-pulse",
+        "block h-3.5 rounded-full bg-border motion-safe:animate-pulse",
         className
       )}
     />
+  );
+}
+
+/** Small caps label above a section. */
+export function Eyebrow({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <p
+      className={cn(
+        "text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground",
+        className
+      )}
+    >
+      {children}
+    </p>
   );
 }

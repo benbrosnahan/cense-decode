@@ -1,4 +1,7 @@
-export type AppView = "input" | "loading" | "results";
+export type AppView = "input" | "results" | "error";
+
+/** Why a decode did not happen. Drives the error screen, never a fake result. */
+export type DecodeFailure = "unavailable" | "rate-limited" | "offline";
 
 export type WorryLevel = "green" | "yellow" | "red";
 
@@ -61,6 +64,23 @@ export interface DecodeResult {
   goDeeper?: GoDeeper;
   /** Always names who to double-check with. */
   disclaimer: string;
+  /**
+   * Set only on the safe fallback, when nothing was actually analyzed. The
+   * client shows an error with a retry instead of dressing a failure up as a
+   * decode. normalizeResult never sets this, so a real result cannot carry it.
+   */
+  failure?: DecodeFailure;
+}
+
+/** What the student submitted, kept so results can quote it back to them. */
+export interface Submission {
+  text: string;
+  image: {
+    preview: string;
+    mediaType: "image/png" | "image/jpeg" | "image/webp";
+    dataBase64: string;
+    name: string;
+  } | null;
 }
 
 /** Request body for POST /api/decode. */

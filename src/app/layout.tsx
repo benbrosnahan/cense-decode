@@ -1,16 +1,21 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Bricolage_Grotesque, Instrument_Sans } from "next/font/google";
 import "./globals.css";
 import Nav from "@/components/Nav";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// Two faces, shared with Loan Desk so the Cense tools read as one family.
+// Bricolage carries headlines. Instrument Sans carries everything that gets
+// read, which in Decode is nearly everything.
+const display = Bricolage_Grotesque({
+  variable: "--font-cense-display",
   subsets: ["latin"],
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const body = Instrument_Sans({
+  variable: "--font-cense-body",
   subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -27,6 +32,12 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport: Viewport = {
+  themeColor: "#FFFCEC",
+  width: "device-width",
+  initialScale: 1,
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -35,7 +46,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${display.variable} ${body.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <Nav />

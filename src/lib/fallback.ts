@@ -21,6 +21,7 @@ export function getFallbackDecode(): DecodeResult {
       "Try again in a moment, and if it still matters, ask the actual app or a person you trust to walk you through it.",
     disclaimer:
       "This is a plain-language explainer, not financial advice. Confirm anything that moves money with your bank or someone you trust before acting.",
+    failure: "unavailable",
   };
 }
 
@@ -41,5 +42,6 @@ export function getRateLimitedDecode(): DecodeResult {
       basedOn: ["Too many requests arrived in the last minute."],
     },
     nextStep: "Wait about a minute, then tap Decode again.",
+    failure: "rate-limited",
   };
 }

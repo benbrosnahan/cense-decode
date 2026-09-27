@@ -1,7 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { SkeletonLine } from "@/components/ui/skeleton";
+import { Eyebrow, SkeletonLine } from "@/components/ui/skeleton";
 
 interface Props {
   plainLanguage: string;
@@ -11,31 +10,45 @@ interface Props {
   streaming?: boolean;
 }
 
-export default function PlainLanguageCard({ plainLanguage, analogy, streaming }: Props) {
+// The part people came for, so it gets the largest reading type on the page
+// and a measure short enough to read comfortably on a phone.
+export default function PlainLanguageCard({
+  plainLanguage,
+  analogy,
+  streaming,
+}: Props) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.28, ease: "easeInOut", delay: 0.1 }}
-      className="rounded-xl bg-accent/50 p-5 border-l-2 border-primary/30"
-    >
-      <p className="text-xs font-medium text-foreground/50 uppercase tracking-wide">
-        What this actually says
-      </p>
-      <p className="mt-2 text-sm text-foreground/85 leading-relaxed">
-        {plainLanguage}
-      </p>
-      {analogy ? (
-        <p className="mt-3 text-sm text-foreground/70 leading-relaxed italic">
-          {analogy}
+    <section aria-label="In plain words" className="px-1">
+      <Eyebrow>In plain words</Eyebrow>
+      {plainLanguage ? (
+        <p className="mt-2 text-pretty text-lg leading-relaxed text-foreground sm:text-xl sm:leading-relaxed">
+          {plainLanguage}
         </p>
       ) : (
         streaming && (
-          <div className="mt-3 py-[5px]">
+          <div className="mt-3 flex flex-col gap-3">
+            <SkeletonLine className="w-full" />
+            <SkeletonLine className="w-11/12" />
             <SkeletonLine className="w-2/3" />
           </div>
         )
       )}
-    </motion.div>
+
+      {analogy ? (
+        <div className="mt-5 rounded-2xl bg-secondary p-4 sm:p-5">
+          <Eyebrow>Think of it like this</Eyebrow>
+          <p className="mt-1.5 text-pretty text-base leading-relaxed text-foreground">
+            {analogy}
+          </p>
+        </div>
+      ) : (
+        streaming &&
+        plainLanguage && (
+          <div className="mt-5 rounded-2xl bg-secondary p-4 sm:p-5">
+            <SkeletonLine className="w-2/3" />
+          </div>
+        )
+      )}
+    </section>
   );
 }

@@ -5,9 +5,11 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-soft: var(--soft);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
@@ -15,52 +17,69 @@
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  --color-brand-orange: var(--brand-orange);
+  --color-mark: var(--mark);
+  --color-mark-strong: var(--mark-strong);
   --color-destructive: var(--destructive);
   --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-cense-body), system-ui, sans-serif;
+  --font-display: var(--font-cense-display), var(--font-cense-body), system-ui, sans-serif;
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) * 1.4);
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
+  /* The floor. Nothing in the interface is set smaller than 13px. */
+  --text-xs: 0.8125rem;
+  --text-xs--line-height: 1.2rem;
 }
 
 :root {
-  /* Cense palette, tuned to Loan Lab: navy for text (trust), Tailwind-green
-     for the friendly primary/accent, on a clean slate base. Warm, welcoming,
-     not clinical. */
-  --background: #FFFCEC; /* ~slate-50 */
-  --foreground: #275B2D; /* ~slate-800 navy text */
-  --card: #FFFFFF;
-  --card-foreground: #275B2D;
-  --primary: #275B2D; /* ~green-600, friendly + accessible */
-  --primary-foreground: #FFFCEC;
-  --secondary: #EAF3E7; /* ~green-50 */
-  --secondary-foreground: #275B2D; /* ~green-800 */
-  --muted: #F6F3E1; /* ~slate-100 */
-  --muted-foreground: #5C7F5F; /* ~slate-500 */
-  --accent: #EAF3E7; /* soft green tint */
-  --accent-foreground: #275B2D;
-  --destructive: oklch(0.6 0.21 25);
-  --border: #DCE7D8; /* ~slate-200 */
-  --input: #DCE7D8;
-  --ring: #275B2D;
+  /* Cense palette, shared with Loan Desk. Text colours are solid values, not
+     the foreground at reduced opacity: foreground/50 on white measured 2.5:1,
+     well under the 4.5:1 AA minimum. Every text token below clears it on both
+     the page and the card. */
+  --background: #fffcec;
+  --foreground: #275b2d; /* 7.8:1 on the page */
+  --soft: #3a6b3e; /* body copy one step quieter, 6.1:1 */
+  --card: #ffffff;
+  --card-foreground: #275b2d;
+  --primary: #275b2d;
+  --primary-hover: #1e4623;
+  --primary-foreground: #ffffff;
+  --secondary: #eaf3e7;
+  --secondary-foreground: #275b2d;
+  --muted: #f6f3e1;
+  --muted-foreground: #4a6e4d; /* labels and captions, 5.6:1 */
+  --accent: #eaf3e7;
+  --accent-foreground: #275b2d;
+  --brand-orange: #a8531f; /* 5.2:1. The lighter #C1652E fails as text. */
+  --mark: #f7e4d6; /* highlight behind a decoded term */
+  --mark-strong: #c1652e; /* its underline */
+  --destructive: #991b1b;
+  --border: #dce7d8;
+  --border-strong: #bfdcb8;
+  --input: #bfdcb8;
+  --ring: #275b2d;
   --radius: 0.875rem;
 }
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
+    @apply border-border;
   }
   html {
     @apply font-sans;
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-background text-foreground;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
 
@@ -69,13 +88,46 @@
 }
 
 *:focus-visible {
-  outline: 2px solid #275B2D;
+  outline: 2px solid #275b2d;
   outline-offset: 2px;
-  border-radius: 6px;
 }
 
 /* Soft, friendly elevation for cards. */
 .card-soft {
-  box-shadow: 0 1px 2px oklch(0.3 0.03 255 / 0.04),
-    0 4px 16px oklch(0.3 0.03 255 / 0.05);
+  box-shadow: 0 1px 0 rgba(39, 91, 45, 0.04),
+    0 8px 24px -12px rgba(39, 91, 45, 0.18);
+}
+.card-lift {
+  box-shadow: 0 1px 0 rgba(39, 91, 45, 0.05),
+    0 16px 32px -16px rgba(39, 91, 45, 0.28);
+}
+
+/* A decoded term inside the student's own words. Underline plus background,
+   so it is never colour alone. */
+.term {
+  background: var(--mark);
+  border-bottom: 2px solid var(--mark-strong);
+  border-radius: 4px 4px 0 0;
+  padding: 1px 3px;
+  margin: 0 -1px;
+  font-weight: 600;
+  cursor: pointer;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+.term:hover,
+.term[aria-pressed="true"] {
+  background: var(--mark-strong);
+  color: #fff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

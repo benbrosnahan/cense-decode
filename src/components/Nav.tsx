@@ -1,22 +1,31 @@
 export default function Nav() {
   return (
-    <header className="sticky top-0 z-50 bg-background/95 backdrop-blur border-b border-border">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <a
-            href="https://cense.beehiiv.com"
-            className="flex items-center gap-2 rounded-lg hover:opacity-75 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-            aria-label="Cense newsletter home"
-          >
-            <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground text-xs font-bold">C</span>
-            </div>
-            <span className="font-semibold text-foreground">Cense</span>
-          </a>
-          <span className="text-muted-foreground/60">/</span>
-          <span className="text-muted-foreground text-sm">Decode</span>
-        </div>
-      </div>
+    <header className="mx-auto flex w-full max-w-2xl items-center justify-between gap-3 px-4 pt-5 sm:px-6 sm:pt-7">
+      <p className="flex items-baseline gap-1.5 whitespace-nowrap font-display text-lg font-bold sm:text-xl">
+        <a
+          href="https://cense.beehiiv.com"
+          className="rounded-md text-brand-orange hover:underline"
+          aria-label="Cense newsletter home"
+        >
+          Cense
+        </a>
+        <span className="text-foreground">Decode</span>
+      </p>
+      <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-secondary px-3 py-1.5 text-xs font-semibold text-foreground">
+        <svg
+          aria-hidden
+          viewBox="0 0 16 16"
+          className="h-3.5 w-3.5 flex-shrink-0"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={1.6}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M8 1.8 13 4v3.6c0 3-2 5.4-5 6.6-3-1.2-5-3.6-5-6.6V4l5-2.2Z" />
+        </svg>
+        Nothing stored
+      </span>
     </header>
   );
 }

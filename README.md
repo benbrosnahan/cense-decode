@@ -30,6 +30,31 @@ overwhelmed reliably produces zero actions.
   something useful rather than to an error screen.
 - No accounts, no database, nothing about the user is stored.
 
+## Design overhaul (2026-09-27)
+
+Branch `ux-overhaul`. The prompt, the model call and the scam clamp are unchanged.
+
+- **Answer first, evidence second.** Results read in a fixed order: how urgent, what it
+  means, the one thing to do, then the original with every decoded term marked where it
+  appeared. Someone can stop reading at any point and still leave with what matters.
+- **Your words, marked up** (`src/components/SourceMarkup.tsx`). Students cannot check an
+  explanation against expertise they do not have, so the document is the check. Terms are
+  tap-to-open and also listed in full, because a hover tooltip does not exist on a phone.
+- **The urgency scale shows all three steps.** "Moderate" on its own had no scale. Still
+  neutral ink only, no red, amber or green.
+- **A failure is shown as a failure.** The safe fallback now carries `failure`, and the
+  client shows an error with Try again and Edit what I sent. What was typed is never lost.
+  Before, a failed decode rendered as a result with an urgency level.
+- **Screenshots of any size.** Large images are scaled to 1568px on the long edge in the
+  browser (`src/lib/image.ts`) instead of being rejected at 5 MB. Pasting an image works.
+- **Privacy is stated at the point of upload**, with a prompt to cover account numbers.
+  The old footer opened with "Your data stays on your device", which the next sentence
+  contradicted. That line is gone.
+- **Examples are documents, not questions**, matching the reasoning above.
+- **Contrast.** Text colours are solid tokens. `foreground/50` on white measured 2.5:1.
+- Geist is replaced by Bricolage Grotesque and Instrument Sans, shared with Loan Desk.
+  `framer-motion` is no longer imported and can be removed from `package.json`.
+
 ## Run it
 
 ```bash

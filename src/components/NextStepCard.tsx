@@ -1,7 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { SkeletonLine } from "@/components/ui/skeleton";
+import { useState } from "react";
 
 interface Props {
   /** Empty or absent while it is still on its way. */
@@ -11,62 +10,80 @@ interface Props {
   streaming?: boolean;
 }
 
-export default function NextStepCard({ nextStep, considerations, streaming }: Props) {
+// The one thing to do. It is the only filled block on the results page, so it
+// is the first thing the eye lands on after the verdict.
+export default function NextStepCard({
+  nextStep,
+  considerations,
+  streaming,
+}: Props) {
+  const [copied, setCopied] = useState(false);
+
+  async function copy() {
+    if (!nextStep) return;
+    try {
+      await navigator.clipboard.writeText(nextStep);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2200);
+    } catch {
+      // Clipboard blocked. The text is on screen to select by hand.
+    }
+  }
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.28, ease: "easeInOut", delay: 0.3 }}
-      className="rounded-xl bg-card ring-1 ring-foreground/10 card-soft p-5"
+    <section
+      aria-label="Do this next"
+      className="rounded-3xl bg-primary p-5 text-primary-foreground card-lift sm:p-7"
     >
-      <div className="flex items-start gap-3">
-        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
-          <svg
-            className="w-4 h-4 text-primary"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-foreground">Your next step</p>
-          {nextStep ? (
-            <p className="mt-0.5 text-sm text-foreground/75 leading-relaxed">
-              {nextStep}
-            </p>
-          ) : (
-            streaming && (
-              <div className="mt-0.5 flex flex-col gap-[10px] py-[5px]">
-                <SkeletonLine className="w-11/12" />
-                <SkeletonLine className="w-1/2" />
-              </div>
-            )
-          )}
-        </div>
-      </div>
+      <p className="text-xs font-semibold uppercase tracking-[0.08em] text-white/80">
+        Do this next
+      </p>
+      {nextStep ? (
+        <p className="mt-2 text-pretty font-display text-xl font-bold leading-snug sm:text-2xl">
+          {nextStep}
+        </p>
+      ) : (
+        streaming && (
+          <div className="mt-3 flex flex-col gap-3">
+            <span className="block h-4 w-11/12 rounded-full bg-white/25 motion-safe:animate-pulse" />
+            <span className="block h-4 w-1/2 rounded-full bg-white/25 motion-safe:animate-pulse" />
+          </div>
+        )
+      )}
+
+      {nextStep && !streaming && (
+        <button
+          type="button"
+          onClick={copy}
+          className="mt-4 inline-flex min-h-10 items-center gap-2 rounded-full bg-white/15 px-4 text-sm font-semibold text-white transition-colors hover:bg-white/25 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+        >
+          <span aria-live="polite">
+            {copied ? "✓ Copied" : "Copy this step"}
+          </span>
+        </button>
+      )}
 
       {considerations && considerations.length > 0 && (
-        <div className="mt-4 pt-4 border-t border-border/70">
-          <p className="text-xs font-medium text-foreground/50 uppercase tracking-wide">
-            Things to think about
+        <div className="mt-5 border-t border-white/25 pt-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.08em] text-white/80">
+            Before you decide
           </p>
-          <ul className="mt-2 flex flex-col gap-1.5">
+          <ul className="mt-2 flex flex-col gap-2">
             {considerations.map((c, i) => (
-              <li key={i} className="flex gap-2 text-sm text-foreground/75 leading-relaxed">
-                <span className="text-primary/50 mt-0.5">•</span>
+              <li
+                key={i}
+                className="flex gap-2.5 text-base leading-snug text-white/95"
+              >
+                <span
+                  aria-hidden
+                  className="mt-[0.6em] h-1.5 w-1.5 flex-shrink-0 rounded-full bg-white/70"
+                />
                 <span>{c}</span>
               </li>
             ))}
           </ul>
         </div>
       )}
-    </motion.div>
+    </section>
   );
 }
