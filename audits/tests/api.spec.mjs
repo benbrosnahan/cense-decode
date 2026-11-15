@@ -94,10 +94,10 @@ test('MODEL-01 the route defaults to claude-opus-5-5 and DECODE_MODEL still over
   expect(route).toMatch(/process\.env\.DECODE_MODEL \|\| "claude-opus-5-5"/);
 });
 
-test('MODEL-01 the route asks for the tool without forcing it, at low effort, with no up-front thinking', async () => {
+test('MODEL-01 the route asks for the tool without forcing it, at low effort, with no thinking field (Opus 5.5 rejects disabled and between_tools)', async () => {
   expect(route).toMatch(/tool_choice: \{ type: "auto" \}/);
   expect(route).not.toMatch(/tool_choice: \{ type: "(tool|any)"/);
-  expect(route).toMatch(/thinking: \{ type: "between_tools" \}/);
+  expect(route).not.toMatch(/thinking:\s*\{/);
   expect(route).toMatch(/process\.env\.DECODE_EFFORT \|\| "low"/);
   expect(route).not.toMatch(/temperature|top_p|top_k/);
 });

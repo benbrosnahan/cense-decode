@@ -230,9 +230,9 @@ export async function POST(request: Request) {
           // The tool is strict and the system prompt says to always call it;
           // an answer without the call is handled below.
           tool_choice: { type: "auto" },
-          // Thinking cannot be switched off on Opus 5.5. between_tools skips
-          // thinking before the first (and only) tool call.
-          thinking: { type: "between_tools" },
+          // Thinking is always on for Opus 5.5 (adaptive), and it rejects both
+          // "disabled" and "between_tools" with a 400, so no thinking field is
+          // sent. Low effort keeps the thinking short.
           output_config: { effort: EFFORT },
           messages,
         });

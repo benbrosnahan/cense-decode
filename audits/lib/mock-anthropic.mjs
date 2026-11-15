@@ -118,6 +118,8 @@ export function refusalReason(body) {
   const choice = body?.tool_choice?.type;
   if (choice === 'tool' || choice === 'any') return `tool_choice.type "${choice}" is not supported with this model`;
   if (body?.thinking?.type === 'disabled') return 'thinking cannot be disabled for this model';
+  // Seen live on 2026-11-15: Opus 5.5 returns 400 "thinking.type.between_tools is not supported for this model".
+  if (body?.thinking?.type === 'between_tools' && /opus/.test(body?.model ?? '')) return '"thinking.type.between_tools" is not supported for this model.';
   for (const k of ['temperature', 'top_p', 'top_k']) if (k in (body ?? {})) return `${k} is not supported with this model`;
   if (body?.messages?.[0]?.role === 'assistant' || (body?.messages?.length > 1 && body.messages.at(-1).role === 'assistant')) {
     return 'assistant prefill is not supported with this model';
