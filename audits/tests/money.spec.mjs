@@ -1,0 +1,131 @@
+// Money and claims: the urgency read a student acts on, results that are not complete, the model's
+// instructions, and where "go deeper" sends a student (MONEY-01 to MONEY-04 in audits/REPORT.md).
+//
+// The scam and urgency oracle below is written from the regulators' own descriptions, not from the app's pattern
+// list, and each message is phrased the way the real thing reads:
+//   FTC, phishing: https://consumer.ftc.gov/articles/how-recognize-and-avoid-phishing-scams
+//   FTC, gift cards: https://consumer.ftc.gov/articles/avoiding-and-reporting-gift-card-scams
+//   FTC, payment apps and crypto: https://consumer.ftc.gov/articles/how-avoid-scam
+//   Federal Student Aid, never pay for help: https://studentaid.gov/resources/scams
+//   CFPB, late fees and collections: https://www.consumerfinance.gov/ask-cfpb/what-is-a-late-fee-en-2073/
+// The stand-in API is told to call every one of them green, the worst case for a model. The server must never
+// let that through as calm.
+import { readFileSync } from 'node:fs';
+import { test, expect, knownIssue, needsMock, decodeText, urgencyWord, urgencyHeadline, postDecode, finalOf } from './helpers.mjs';
+
+const MODEL_GREEN_HEADLINE = 'Nothing here to act on, you can relax.';
+
+const SCAM_AND_URGENCY = [
+  ['gift cards, plural', 'To release your tax refund, buy two $100 gift cards and text me the codes on the back.'],
+  ['a payment app', 'Send the $400 deposit by Zelle today to hold the apartment. Other students are interested.'],
+  ['crypto by name', 'Pay the $150 processing fee in Bitcoin to unlock your account.'],
+  ['suspicious activity and a login link', 'We noticed suspicious activity on your account. Confirm your login details at the link below.'],
+  ['a freeze threat with a clock', 'Your card will be frozen in 24 hours unless you call 1-800-555-0100.'],
+  ['a late payment and a fee', 'Your payment is 30 days past due and a $35 late fee has been charged to your account.'],
+  ['paid help with loan forgiveness', 'Pay a one-time $299 fee and our team will get your student loans forgiven in 30 days.'],
+  ['a refund to claim', 'Click here to claim your $500 government refund before it expires.'],
+  ['a final notice', 'FINAL NOTICE: your balance will be sent to collections.'],
+  ['a wire request', 'Wire the remaining tuition balance to the account below by Friday.'],
+];
+
+for (const [name, text] of SCAM_AND_URGENCY) {
+  test(`MONEY-01 scam or urgency wording never comes back calm: ${name}`, async ({ page }) => {
+    needsMock();
+    knownIssue('MONEY-01');
+    await decodeText(page, `${text} [[mock:green]]`);
+    expect(await urgencyWord(page)).not.toBe('Low');
+    // Lifting the level is not enough if the headline still says relax.
+    expect(await urgencyHeadline(page)).not.toBe(MODEL_GREEN_HEADLINE);
+  });
+}
+
+test('MONEY-01 a screenshot is checked too: the model\'s own explanation of a gift card demand is never calm', async ({ request }) => {
+  needsMock();
+  knownIssue('MONEY-01');
+  // A 1x1 white PNG. The server never reads the pixels, only what the model says about them.
+  const png = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==';
+  const res = await postDecode(request, {
+    mode: 'image',
+    image: { mediaType: 'image/png', dataBase64: png },
+    text: '[[mock:green-explains-gift-cards]]',
+  });
+  const final = finalOf(await res.text());
+  expect(final.failure).toBeUndefined();
+  expect(final.worry.level).not.toBe('green');
+});
+
+test('the clamp does not fire on ordinary words: a plain question the model calls calm stays calm', async ({ page }) => {
+  needsMock();
+  await decodeText(page, 'What does APR stand for on a credit card statement? [[mock:green]]');
+  expect(await urgencyWord(page)).toBe('Low');
+});
+
+test('MONEY-02 a decode cut off at the token cap is shown as a failure, not as a finished result', async ({ page }) => {
+  needsMock();
+  knownIssue('MONEY-02');
+  await decodeText(page, 'A short bill. [[mock:max-tokens]]');
+  await expect(page.getByRole('button', { name: /try again/i })).toBeVisible();
+  await expect(page.getByText(/could not read that/i)).toBeVisible();
+});
+
+test('MONEY-02 a cut inside the urgency read never shows an urgency level nobody wrote', async ({ request }) => {
+  needsMock();
+  knownIssue('MONEY-02');
+  const final = finalOf(await (await postDecode(request, { text: 'A short bill. [[mock:max-tokens-early]]' })).text());
+  expect(final.failure).toBe('unavailable');
+});
+
+test('a refusal partway through is shown as a failure', async ({ page }) => {
+  needsMock();
+  await decodeText(page, 'A short bill. [[mock:refusal]]');
+  await expect(page.getByRole('button', { name: /try again/i })).toBeVisible();
+});
+
+// The model's instructions. Read as text: these check what the prompt says, not what the app computes.
+const prompt = readFileSync(new URL('../../src/lib/prompt.ts', import.meta.url), 'utf8');
+
+test('MONEY-03 the prompt tells the model not to state rates, limits or plan rules from memory', async () => {
+  knownIssue('MONEY-03');
+  expect(prompt).toMatch(/only (the )?numbers?[^.]*(in|from) the input/i);
+  expect(prompt).toMatch(/studentaid\.gov/i);
+});
+
+test('MONEY-03 the prompt\'s examples carry no interest rate the model could copy onto someone else\'s offer', async () => {
+  knownIssue('MONEY-03');
+  expect(prompt).not.toMatch(/\b\d{1,2} to \d{1,2} percent\b/i);
+});
+
+test('MONEY-04 the calibration examples do not forecast the market or call a step certain', async () => {
+  knownIssue('MONEY-04');
+  expect(prompt).not.toMatch(/not a sign of a storm/i);
+  expect(prompt).not.toMatch(/begin with one broad ETF/i);
+});
+
+// Where "go deeper" sends a student, per topic. The expected addresses are the live Cense tools as listed in the
+// audit brief, checked by page title on 2026-11-15, not read from src/lib/routes.ts.
+const DEEPER = [
+  ['investing', 'https://invest-ready.vercel.app'],
+  ['job-offer', 'https://offer-lab-ivory.vercel.app'],
+  ['student-loan', 'https://cense-loan-desk.vercel.app'],
+  ['credit-card', 'https://cense.vercel.app'],
+  ['purchase-decision', 'https://worth-it-omega.vercel.app'],
+];
+
+for (const [topic, url] of DEEPER) {
+  test(`go deeper for ${topic} opens ${url}`, async ({ page }) => {
+    needsMock();
+    await decodeText(page, `Something about money. [[topic:${topic}]]`);
+    const link = page.getByRole('link', { name: /another free cense tool/i });
+    await expect(link).toHaveAttribute('href', new RegExp(`^${url.replace(/\./g, '\\.')}/?\\?`));
+    await expect(link).toHaveAttribute('target', '_blank');
+    await expect(link).toHaveAttribute('rel', /noopener/);
+  });
+}
+
+for (const topic of ['general-finance', 'none']) {
+  test(`no go-deeper link is shown for ${topic}`, async ({ page }) => {
+    needsMock();
+    await decodeText(page, `Something about money. [[topic:${topic}]]`);
+    await expect(page.getByRole('link', { name: /another free cense tool/i })).toHaveCount(0);
+  });
+}

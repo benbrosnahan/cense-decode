@@ -1,0 +1,58 @@
+    Error: expect(locator).toBeVisible() failed
+    test-results/money-MONEY-02-a-decode-cu-a7cac-re-not-as-a-finished-result-chromium/test-failed-1.png
+  21) [chromium] › tests/money.spec.mjs:71:1 › MONEY-02 a cut inside the urgency read never shows an urgency level nobody wrote 
+  22) [chromium] › tests/money.spec.mjs:87:1 › MONEY-03 the prompt tells the model not to state rates, limits or plan rules from memory 
+  23) [chromium] › tests/money.spec.mjs:93:1 › MONEY-03 the prompt's examples carry no interest rate the model could copy onto someone else's offer 
+  24) [chromium] › tests/money.spec.mjs:98:1 › MONEY-04 the calibration examples do not forecast the market or call a step certain 
+  25) [chromium] › tests/security-seo.spec.mjs:13:1 › SEC-01 the page refuses framing and MIME sniffing, limits where scripts load from, and switches off unused device features 
+  26) [chromium] › tests/security-seo.spec.mjs:24:1 › SEC-01 the API route carries the same headers 
+  27) [chromium] › tests/security-seo.spec.mjs:34:1 › SEC-02 the privacy footer matches Anthropic's terms: no "never", the 30 days and the safety-review exception named 
+    test-results/security-seo-SEC-02-the-pr-8a332-fety-review-exception-named-chromium/test-failed-1.png
+  28) [chromium] › tests/security-seo.spec.mjs:44:1 › SEC-02 the note beside the input does not promise more than the footer 
+    test-results/security-seo-SEC-02-the-no-b99f9-romise-more-than-the-footer-chromium/test-failed-1.png
+  29) [chromium] › tests/security-seo.spec.mjs:52:1 › SEC-02 the header badge claims only what Cense controls 
+    Error: expect(locator).not.toContainText(expected) failed
+    test-results/security-seo-SEC-02-the-he-f3739-ms-only-what-Cense-controls-chromium/test-failed-1.png
+  30) [chromium] › tests/security-seo.spec.mjs:58:1 › SEC-05 Next.js is on a release with the 2026 security fixes (16.4.6 or later) 
+  31) [chromium] › tests/security-seo.spec.mjs:65:1 › SEO-01 a shared link has a preview title, description, image and its own canonical address 
+  32) [chromium] › tests/security-seo.spec.mjs:75:1 › SEO-01 robots.txt and sitemap.xml exist, and robots keeps crawlers off the API 
+  33) [chromium] › tests/security-seo.spec.mjs:85:1 › SEO-01 the server HTML describes the tool as structured data 
+  34) [chromium] › tests/ux.spec.mjs:5:1 › UX-01 a term the model rewords ("unsubsidized loan") is still marked where the student wrote it 
+    Error: expect(locator).toHaveCount(expected) failed
+    test-results/ux-UX-01-a-term-the-model--9860c--where-the-student-wrote-it-chromium/test-failed-1.png
+  34 failed
+    [chromium] › tests/a11y.spec.mjs:29:5 › axe finds no WCAG A or AA violations on the result screen, phone 
+    [chromium] › tests/a11y.spec.mjs:29:5 › axe finds no WCAG A or AA violations on the result screen, desktop 
+    [chromium] › tests/api.spec.mjs:27:1 › SEC-03 another site cannot post a decode through a visitor's browser 
+    [chromium] › tests/api.spec.mjs:33:1 › SEC-03 a cross-site text/plain form post, which skips the CORS preflight, is refused 
+    [chromium] › tests/api.spec.mjs:49:1 › SEC-04 every answer from the route says no-store, so no cache keeps a student's document 
+    [chromium] › tests/limiter.spec.mjs:7:1 › SEC-06 addresses whose minute is over are forgotten, so the limiter does not grow forever 
+    [chromium] › tests/limiter.spec.mjs:19:1 › SEC-06 even under a flood of fresh addresses the limiter stays under its cap 
+    [chromium] › tests/limiter.spec.mjs:27:1 › SEC-06 the sixth hit inside a minute is limited and the minute after is not 
+    [chromium] › tests/money.spec.mjs:32:3 › MONEY-01 scam or urgency wording never comes back calm: gift cards, plural 
+    [chromium] › tests/money.spec.mjs:32:3 › MONEY-01 scam or urgency wording never comes back calm: a payment app 
+    [chromium] › tests/money.spec.mjs:32:3 › MONEY-01 scam or urgency wording never comes back calm: crypto by name 
+    [chromium] › tests/money.spec.mjs:32:3 › MONEY-01 scam or urgency wording never comes back calm: suspicious activity and a login link 
+    [chromium] › tests/money.spec.mjs:32:3 › MONEY-01 scam or urgency wording never comes back calm: a freeze threat with a clock 
+    [chromium] › tests/money.spec.mjs:32:3 › MONEY-01 scam or urgency wording never comes back calm: a late payment and a fee 
+    [chromium] › tests/money.spec.mjs:32:3 › MONEY-01 scam or urgency wording never comes back calm: paid help with loan forgiveness 
+    [chromium] › tests/money.spec.mjs:32:3 › MONEY-01 scam or urgency wording never comes back calm: a refund to claim 
+    [chromium] › tests/money.spec.mjs:32:3 › MONEY-01 scam or urgency wording never comes back calm: a final notice 
+    [chromium] › tests/money.spec.mjs:32:3 › MONEY-01 scam or urgency wording never comes back calm: a wire request 
+    [chromium] › tests/money.spec.mjs:42:1 › MONEY-01 a screenshot is checked too: the model's own explanation of a gift card demand is never calm 
+    [chromium] › tests/money.spec.mjs:63:1 › MONEY-02 a decode cut off at the token cap is shown as a failure, not as a finished result 
+    [chromium] › tests/money.spec.mjs:71:1 › MONEY-02 a cut inside the urgency read never shows an urgency level nobody wrote 
+    [chromium] › tests/money.spec.mjs:87:1 › MONEY-03 the prompt tells the model not to state rates, limits or plan rules from memory 
+    [chromium] › tests/money.spec.mjs:93:1 › MONEY-03 the prompt's examples carry no interest rate the model could copy onto someone else's offer 
+    [chromium] › tests/money.spec.mjs:98:1 › MONEY-04 the calibration examples do not forecast the market or call a step certain 
+    [chromium] › tests/security-seo.spec.mjs:13:1 › SEC-01 the page refuses framing and MIME sniffing, limits where scripts load from, and switches off unused device features 
+    [chromium] › tests/security-seo.spec.mjs:24:1 › SEC-01 the API route carries the same headers ──
+    [chromium] › tests/security-seo.spec.mjs:34:1 › SEC-02 the privacy footer matches Anthropic's terms: no "never", the 30 days and the safety-review exception named 
+    [chromium] › tests/security-seo.spec.mjs:44:1 › SEC-02 the note beside the input does not promise more than the footer 
+    [chromium] › tests/security-seo.spec.mjs:52:1 › SEC-02 the header badge claims only what Cense controls 
+    [chromium] › tests/security-seo.spec.mjs:58:1 › SEC-05 Next.js is on a release with the 2026 security fixes (16.4.6 or later) 
+    [chromium] › tests/security-seo.spec.mjs:65:1 › SEO-01 a shared link has a preview title, description, image and its own canonical address 
+    [chromium] › tests/security-seo.spec.mjs:75:1 › SEO-01 robots.txt and sitemap.xml exist, and robots keeps crawlers off the API 
+    [chromium] › tests/security-seo.spec.mjs:85:1 › SEO-01 the server HTML describes the tool as structured data 
+    [chromium] › tests/ux.spec.mjs:5:1 › UX-01 a term the model rewords ("unsubsidized loan") is still marked where the student wrote it 
+  40 passed (23.1s)
