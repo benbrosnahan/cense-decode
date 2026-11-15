@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 // The decode route, /api/decode: who may call it, what it refuses, how it fails, what it lets a cache keep, and
 // what reaches the browser (SEC-03, SEC-04 and SEC-06 in audits/REPORT.md). Nothing here reaches a real model.
 import { test, expect, needsMock, postDecode, freshIp, events, finalOf } from './helpers.mjs';
@@ -82,4 +83,58 @@ test('no script the browser loads carries an Anthropic key or a model name', asy
     const js = await (await request.get(src)).text();
     expect(js, src).not.toMatch(/sk-ant-|ANTHROPIC_API_KEY|claude-(sonnet|opus|haiku)|DECODE_MODEL/);
   }
+});
+
+// MODEL-01: Claude Opus 5.5. The stand-in API refuses, with a 400, every request Opus 5.5 refuses (a forced
+// tool_choice, thinking off, temperature, a prefill, a strict tool with an open object; lib/mock-anthropic.mjs),
+// so every passing decode above also shows the route sends a request the model accepts.
+const route = readFileSync(new URL('../../src/app/api/decode/route.ts', import.meta.url), 'utf8');
+
+test('MODEL-01 the route defaults to claude-opus-5-5 and DECODE_MODEL still overrides it', async () => {
+  expect(route).toMatch(/process\.env\.DECODE_MODEL \|\| "claude-opus-5-5"/);
+});
+
+test('MODEL-01 the route asks for the tool without forcing it, at low effort, with no up-front thinking', async () => {
+  expect(route).toMatch(/tool_choice: \{ type: "auto" \}/);
+  expect(route).not.toMatch(/tool_choice: \{ type: "(tool|any)"/);
+  expect(route).toMatch(/thinking: \{ type: "between_tools" \}/);
+  expect(route).toMatch(/process\.env\.DECODE_EFFORT \|\| "low"/);
+  expect(route).not.toMatch(/temperature|top_p|top_k/);
+});
+
+test('MODEL-01 the SDK is 1.8.0 or later, so new stream events parse', async () => {
+  const pkg = JSON.parse(readFileSync(new URL('../../node_modules/@anthropic-ai/sdk/package.json', import.meta.url), 'utf8'));
+  const [maj, min] = pkg.version.split('.').map(Number);
+  expect(maj * 1000 + min, pkg.version).toBeGreaterThanOrEqual(1008);
+});
+
+test('MODEL-01 a text block before the tool call does not stop the decode', async ({ request }) => {
+  needsMock();
+  const final = finalOf(await (await postDecode(request, { text: 'A short bill for $40. [[mock:text-first]]' })).text());
+  expect(final.failure).toBeUndefined();
+  expect(final.plainLanguage).toMatch(/ordinary money message/);
+});
+
+test('MODEL-01 an answer without the tool call is asked for once more, and the second answer is shown', async ({ request }) => {
+  needsMock();
+  const evs = events(await (await postDecode(request, { text: 'A short bill for $40. [[mock:no-tool]]' })).text());
+  const final = evs.find(e => e.type === 'final').data;
+  expect(final.failure).toBeUndefined();
+  expect(final.worry.level).toBe('yellow');
+});
+
+test('MODEL-01 a model that never calls the tool gets the failure screen, not an empty result', async ({ page }) => {
+  needsMock();
+  await page.goto('/');
+  await page.locator('#source').fill('A short bill for $40. [[mock:no-tool-ever]]');
+  await page.getByRole('button', { name: /decode it/i }).click();
+  await expect(page.getByRole('button', { name: /try again/i })).toBeVisible({ timeout: 15_000 });
+});
+
+test('MODEL-01 image mode still decodes', async ({ request }) => {
+  needsMock();
+  const png = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==';
+  const final = finalOf(await (await postDecode(request, { mode: 'image', image: { mediaType: 'image/png', dataBase64: png } })).text());
+  expect(final.failure).toBeUndefined();
+  expect(final.plainLanguage).toBeTruthy();
 });

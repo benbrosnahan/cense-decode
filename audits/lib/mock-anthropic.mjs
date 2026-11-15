@@ -2,8 +2,13 @@
 // SDK and the real normalizer without spending money or depending on what a model happens to say.
 //
 // The route's SDK is pointed here with ANTHROPIC_BASE_URL (see lib/serve-with-mock.mjs). The mock streams the
-// same server-sent events the API streams for a forced tool call: message_start, a tool_use block whose input
-// arrives as input_json_delta chunks, message_delta with the stop reason, message_stop.
+// same server-sent events the API streams for a tool call: message_start, a tool_use block whose input arrives as
+// input_json_delta chunks, message_delta with the stop reason, message_stop.
+//
+// It also refuses, with a 400, every request Claude Opus 5.5 refuses (checked against Anthropic's docs,
+// 2026-11-15): a tool_choice of type "tool" or "any", thinking switched off, temperature, top_p or top_k, an
+// assistant prefill, and a strict tool whose objects do not all set additionalProperties: false. A route that
+// still sends any of these fails every test that reaches the model.
 //
 // A test picks what the "model" does by writing a marker into the text it decodes:
 //   [[mock:<scenario>]]   one of SCENARIOS below
@@ -53,6 +58,10 @@ export const SCENARIOS = {
   'green-explains-gift-cards': {
     input: { ...GREEN, plainLanguage: 'This screenshot asks you to pay a fee with Apple gift cards to unlock your refund.' },
   },
+  // A yellow card-offer read whose explanation rules a scam out.
+  'yellow-not-a-scam': {
+    input: { ...GENERIC, plainLanguage: 'This is a normal card offer, not a scam. It pays a little back on dining.', topic: 'credit-card' },
+  },
   // The terms come back reworded, not as the student wrote them.
   'terms-reworded': {
     input: {
@@ -71,6 +80,12 @@ export const SCENARIOS = {
   'max-tokens-early': { input: GENERIC, cutAt: 'basedOn', stopReason: 'max_tokens' },
   // The model declines partway.
   refusal: { input: GENERIC, cutAt: 'analogy', stopReason: 'refusal' },
+  // With tool_choice auto the model answers in text and never calls the tool. Asked once more, it calls it.
+  'no-tool': { text: 'Here is what this means in plain words.', thenInput: GENERIC },
+  // It answers in text both times.
+  'no-tool-ever': { text: 'Here is what this means in plain words.' },
+  // A short text block first, then the tool call at index 1.
+  'text-first': { input: GENERIC, leadText: 'Decoding it now.' },
   // The API itself fails. The message carries a sentinel a test looks for in what reaches the browser.
   'api-error': { status: 401, error: { type: 'authentication_error', message: 'MOCK-SENTINEL invalid x-api-key sk-ant-mock' } },
   'api-overloaded': { status: 529, error: { type: 'overloaded_error', message: 'MOCK-SENTINEL overloaded' } },
@@ -98,24 +113,66 @@ function pick(text) {
   return scenario;
 }
 
+/** Why Claude Opus 5.5 would refuse this request, or null when it would accept it. */
+export function refusalReason(body) {
+  const choice = body?.tool_choice?.type;
+  if (choice === 'tool' || choice === 'any') return `tool_choice.type "${choice}" is not supported with this model`;
+  if (body?.thinking?.type === 'disabled') return 'thinking cannot be disabled for this model';
+  for (const k of ['temperature', 'top_p', 'top_k']) if (k in (body ?? {})) return `${k} is not supported with this model`;
+  if (body?.messages?.[0]?.role === 'assistant' || (body?.messages?.length > 1 && body.messages.at(-1).role === 'assistant')) {
+    return 'assistant prefill is not supported with this model';
+  }
+  const open = [];
+  const walk = (node, at) => {
+    if (Array.isArray(node)) return node.forEach((n, i) => walk(n, `${at}[${i}]`));
+    if (!node || typeof node !== 'object') return;
+    if (node.type === 'object' && node.additionalProperties !== false) open.push(at);
+    for (const [k, v] of Object.entries(node)) walk(v, `${at}.${k}`);
+  };
+  for (const tool of body?.tools ?? []) if (tool.strict) walk(tool.input_schema, tool.name);
+  if (open.length) return `strict tool objects need additionalProperties: false (${open.join(', ')})`;
+  return null;
+}
+
 const sse = (type, data) => `event: ${type}\ndata: ${JSON.stringify({ type, ...data })}\n\n`;
 
-function streamBody(scenario, model) {
-  let json = JSON.stringify(scenario.input);
-  if (scenario.cutAt) {
-    const at = json.indexOf(`"${scenario.cutAt}"`);
-    json = json.slice(0, at + Math.floor(scenario.cutAt.length / 2) + 1);
-  }
-  const chunks = json.match(/.{1,24}/gs) ?? [];
-  let out = sse('message_start', {
+function textBlock(index, text) {
+  return (
+    sse('content_block_start', { index, content_block: { type: 'text', text: '' } }) +
+    sse('content_block_delta', { index, delta: { type: 'text_delta', text } }) +
+    sse('content_block_stop', { index })
+  );
+}
+
+function streamBody(scenario, model, turn) {
+  const start = sse('message_start', {
     message: {
       id: 'msg_mock', type: 'message', role: 'assistant', model, content: [],
       stop_reason: null, stop_sequence: null, usage: { input_tokens: 120, output_tokens: 1 },
     },
   });
-  out += sse('content_block_start', { index: 0, content_block: { type: 'tool_use', id: 'toolu_mock', name: 'decode', input: {} } });
-  for (const c of chunks) out += sse('content_block_delta', { index: 0, delta: { type: 'input_json_delta', partial_json: c } });
-  out += sse('content_block_stop', { index: 0 });
+  // A text-only answer: the first time for 'no-tool', every time for 'no-tool-ever'.
+  if (scenario.text && !(scenario.thenInput && turn > 1)) {
+    return (
+      start +
+      textBlock(0, scenario.text) +
+      sse('message_delta', { delta: { stop_reason: 'end_turn', stop_sequence: null }, usage: { output_tokens: 12 } }) +
+      sse('message_stop', {})
+    );
+  }
+  const input = scenario.input ?? scenario.thenInput;
+  let json = JSON.stringify(input);
+  if (scenario.cutAt) {
+    const at = json.indexOf(`"${scenario.cutAt}"`);
+    json = json.slice(0, at + Math.floor(scenario.cutAt.length / 2) + 1);
+  }
+  const chunks = json.match(/.{1,24}/gs) ?? [];
+  let out = start;
+  const index = scenario.leadText ? 1 : 0;
+  if (scenario.leadText) out += textBlock(0, scenario.leadText);
+  out += sse('content_block_start', { index, content_block: { type: 'tool_use', id: 'toolu_mock', name: 'decode', input: {} } });
+  for (const c of chunks) out += sse('content_block_delta', { index, delta: { type: 'input_json_delta', partial_json: c } });
+  out += sse('content_block_stop', { index });
   out += sse('message_delta', { delta: { stop_reason: scenario.stopReason ?? 'tool_use', stop_sequence: null }, usage: { output_tokens: chunks.length * 6 } });
   out += sse('message_stop', {});
   return out;
@@ -135,6 +192,11 @@ export function startMockAnthropic(port = 0) {
       let body = {};
       try { body = JSON.parse(raw); } catch { /* answered below */ }
       requests.push(body);
+      const refused = refusalReason(body);
+      if (refused) {
+        res.writeHead(400, { 'content-type': 'application/json', 'request-id': 'req_mock', 'x-should-retry': 'false' });
+        return res.end(JSON.stringify({ type: 'error', error: { type: 'invalid_request_error', message: `mock: ${refused}` } }));
+      }
       let scenario;
       try {
         scenario = pick(textOf(body));
@@ -147,7 +209,7 @@ export function startMockAnthropic(port = 0) {
         return res.end(JSON.stringify({ type: 'error', error: scenario.error }));
       }
       res.writeHead(200, { 'content-type': 'text/event-stream', 'cache-control': 'no-cache', 'request-id': 'req_mock' });
-      res.end(streamBody(scenario, body.model ?? 'mock'));
+      res.end(streamBody(scenario, body.model ?? 'mock', (body.messages ?? []).filter(m => m.role === 'user').length));
     });
   });
   return new Promise(resolve => {
