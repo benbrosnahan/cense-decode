@@ -23,12 +23,15 @@ overwhelmed reliably produces zero actions.
 
 ## How it is built
 
-- Next.js App Router, TypeScript, Tailwind, Framer Motion
+- Next.js 16 App Router, TypeScript, Tailwind 4
 - Anthropic API called server side only, from `src/app/api/decode/route.ts`. The key is never
   exposed to the client.
-- `src/lib/fallback.ts` handles the case where the model call fails, so the tool degrades to
-  something useful rather than to an error screen.
-- No accounts, no database, nothing about the user is stored.
+- `src/lib/fallback.ts` is the safe failure. When the model call fails, is cut off, or refuses,
+  the page shows an error with Try again, never a made-up result.
+- `src/lib/cues.ts` is the check on the model: scam or urgency wording in the student's words,
+  or in the model's own explanation of a screenshot, can never come back as Low.
+- No accounts, no database, nothing about the user is stored by Cense. Anthropic does not train
+  on API data by default and deletes it within 30 days, unless it is flagged for a safety review.
 
 ## Design overhaul (2026-09-27)
 
@@ -53,7 +56,18 @@ Branch `ux-overhaul`. The prompt, the model call and the scam clamp are unchange
 - **Examples are documents, not questions**, matching the reasoning above.
 - **Contrast.** Text colours are solid tokens. `foreground/50` on white measured 2.5:1.
 - Geist is replaced by Bricolage Grotesque and Instrument Sans, shared with Loan Desk.
-  `framer-motion` is no longer imported and can be removed from `package.json`.
+
+## Audit (2026-11-15)
+
+Branch `audit-redesign`. The findings, fixes and scores are in [audits/REPORT.md](audits/REPORT.md).
+
+```bash
+npm run lint && npm run typecheck && npm run build
+cd audits && npm ci && npm run setup && npm test   # 76 Playwright tests, no API key needed
+```
+
+The tests run the real route against a local stand-in for the Anthropic API
+(`audits/lib/mock-anthropic.mjs`), so they cost nothing and can make the "model" misbehave on purpose.
 
 ## Run it
 
