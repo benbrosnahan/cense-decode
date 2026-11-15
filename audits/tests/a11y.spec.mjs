@@ -97,3 +97,12 @@ test('A11Y-02 the results read as an outline: one h1, then a heading for each bl
   }
   await expect(page.getByRole('navigation', { name: 'Cense' })).toHaveCount(1);
 });
+
+test('nothing scrolls sideways at 320px, the narrowest phone the kit checks', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 640 });
+  await page.goto('/');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBeLessThanOrEqual(0);
+  await mockDecode(page, CARD_DECODE);
+  await decodeText(page, '0% intro APR for 15 months, then a variable APR. No annual fee.');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBeLessThanOrEqual(0);
+});

@@ -20,7 +20,8 @@ export default function Nav() {
         <svg
           aria-hidden
           viewBox="0 0 16 16"
-          className="h-3.5 w-3.5 flex-shrink-0"
+          // Dropped below 360px so the badge fits beside the name at 320px.
+          className="h-3.5 w-3.5 flex-shrink-0 max-[359px]:hidden"
           fill="none"
           stroke="currentColor"
           strokeWidth={1.6}
