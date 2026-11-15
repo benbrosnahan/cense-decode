@@ -1,0 +1,395 @@
+{
+ "url": "https://cense-decode.vercel.app/",
+ "runs": 1,
+ "medianBy": "performance",
+ "pages": {
+  "empty-mobile": {
+   "page": "empty",
+   "formFactor": "mobile",
+   "seeded": false,
+   "medianRun": 1,
+   "summary": {
+    "performance": 99,
+    "accessibility": 100,
+    "bestPractices": 100,
+    "seo": 100,
+    "lcp": 815.367,
+    "fcp": 815.367,
+    "cls": 0,
+    "tbt": 97,
+    "si": 815.367,
+    "tti": 1968.367,
+    "inp": null,
+    "failing": [
+     {
+      "id": "total-blocking-time",
+      "title": "Total Blocking Time",
+      "score": 0.98,
+      "displayValue": "100 ms"
+     },
+     {
+      "id": "max-potential-fid",
+      "title": "Max Potential First Input Delay",
+      "score": 0.91,
+      "displayValue": "120 ms"
+     },
+     {
+      "id": "interactive",
+      "title": "Time to Interactive",
+      "score": 0.99,
+      "displayValue": "2.0 s"
+     },
+     {
+      "id": "unused-javascript",
+      "title": "Reduce unused JavaScript",
+      "score": 0.5,
+      "displayValue": "Est savings of 60 KiB"
+     },
+     {
+      "id": "legacy-javascript-insight",
+      "title": "Legacy JavaScript",
+      "score": 0.5,
+      "displayValue": "Est savings of 14 KiB"
+     },
+     {
+      "id": "network-dependency-tree-insight",
+      "title": "Network dependency tree",
+      "score": 0,
+      "displayValue": null
+     },
+     {
+      "id": "render-blocking-insight",
+      "title": "Render-blocking requests",
+      "score": 0.5,
+      "displayValue": null
+     }
+    ],
+    "opportunities": [
+     {
+      "id": "unused-javascript",
+      "title": "Reduce unused JavaScript",
+      "description": "Reduce unused JavaScript and defer loading scripts until they are required to decrease bytes consumed by network activity. [Learn how to reduce unused JavaScript](https://developer.chrome.com/docs/lighthouse/performance/unused-javascript/).",
+      "score": 0.5,
+      "scoreDisplayMode": "metricSavings",
+      "displayValue": "Est savings of 60 KiB",
+      "numericValue": null,
+      "numericUnit": "millisecond",
+      "savingsBytes": 61248,
+      "items": [
+       {
+        "url": "https://cense-decode.vercel.app/_next/static/chunks/0atut6a2uuyid.js",
+        "wastedBytes": 31500,
+        "wastedMs": null,
+        "totalBytes": 51437
+       },
+       {
+        "url": "https://cense-decode.vercel.app/_next/static/chunks/3n7dm2ojtyzwn.js",
+        "wastedBytes": 29748,
+        "wastedMs": null,
+        "totalBytes": 72425
+       }
+      ]
+     }
+    ],
+    "diagnostics": [],
+    "formFactor": "mobile",
+    "loadError": null
+   },
+   "runs": [
+    {
+     "run": 1,
+     "performance": 99,
+     "accessibility": 100,
+     "bestPractices": 100,
+     "seo": 100,
+     "lcp": 815.367,
+     "fcp": 815.367,
+     "cls": 0,
+     "tbt": 97,
+     "si": 815.367,
+     "tti": 1968.367,
+     "loadError": null
+    }
+   ]
+  },
+  "empty-desktop": {
+   "page": "empty",
+   "formFactor": "desktop",
+   "seeded": false,
+   "medianRun": 1,
+   "summary": {
+    "performance": 100,
+    "accessibility": 100,
+    "bestPractices": 100,
+    "seo": 100,
+    "lcp": 225.101,
+    "fcp": 225.101,
+    "cls": 0,
+    "tbt": 0,
+    "si": 273.779,
+    "tti": 225.101,
+    "inp": null,
+    "failing": [
+     {
+      "id": "unused-javascript",
+      "title": "Reduce unused JavaScript",
+      "score": 0.5,
+      "displayValue": "Est savings of 60 KiB"
+     },
+     {
+      "id": "legacy-javascript-insight",
+      "title": "Legacy JavaScript",
+      "score": 0.5,
+      "displayValue": "Est savings of 14 KiB"
+     },
+     {
+      "id": "network-dependency-tree-insight",
+      "title": "Network dependency tree",
+      "score": 0,
+      "displayValue": null
+     },
+     {
+      "id": "render-blocking-insight",
+      "title": "Render-blocking requests",
+      "score": 0.5,
+      "displayValue": null
+     }
+    ],
+    "opportunities": [
+     {
+      "id": "unused-javascript",
+      "title": "Reduce unused JavaScript",
+      "description": "Reduce unused JavaScript and defer loading scripts until they are required to decrease bytes consumed by network activity. [Learn how to reduce unused JavaScript](https://developer.chrome.com/docs/lighthouse/performance/unused-javascript/).",
+      "score": 0.5,
+      "scoreDisplayMode": "metricSavings",
+      "displayValue": "Est savings of 60 KiB",
+      "numericValue": null,
+      "numericUnit": "millisecond",
+      "savingsBytes": 61248,
+      "items": [
+       {
+        "url": "https://cense-decode.vercel.app/_next/static/chunks/0atut6a2uuyid.js",
+        "wastedBytes": 31500,
+        "wastedMs": null,
+        "totalBytes": 51437
+       },
+       {
+        "url": "https://cense-decode.vercel.app/_next/static/chunks/3n7dm2ojtyzwn.js",
+        "wastedBytes": 29748,
+        "wastedMs": null,
+        "totalBytes": 72425
+       }
+      ]
+     }
+    ],
+    "diagnostics": [],
+    "formFactor": "desktop",
+    "loadError": null
+   },
+   "runs": [
+    {
+     "run": 1,
+     "performance": 100,
+     "accessibility": 100,
+     "bestPractices": 100,
+     "seo": 100,
+     "lcp": 225.101,
+     "fcp": 225.101,
+     "cls": 0,
+     "tbt": 0,
+     "si": 273.779,
+     "tti": 225.101,
+     "loadError": null
+    }
+   ]
+  },
+  "seeded-mobile": {
+   "page": "seeded",
+   "formFactor": "mobile",
+   "seeded": true,
+   "medianRun": 1,
+   "summary": {
+    "performance": 100,
+    "accessibility": 100,
+    "bestPractices": 100,
+    "seo": 100,
+    "lcp": 775.892,
+    "fcp": 775.892,
+    "cls": 0,
+    "tbt": 34,
+    "si": 775.892,
+    "tti": 1905.892,
+    "inp": null,
+    "failing": [
+     {
+      "id": "max-potential-fid",
+      "title": "Max Potential First Input Delay",
+      "score": 0.98,
+      "displayValue": "80 ms"
+     },
+     {
+      "id": "unused-javascript",
+      "title": "Reduce unused JavaScript",
+      "score": 0.5,
+      "displayValue": "Est savings of 60 KiB"
+     },
+     {
+      "id": "legacy-javascript-insight",
+      "title": "Legacy JavaScript",
+      "score": 0.5,
+      "displayValue": "Est savings of 14 KiB"
+     },
+     {
+      "id": "network-dependency-tree-insight",
+      "title": "Network dependency tree",
+      "score": 0,
+      "displayValue": null
+     },
+     {
+      "id": "render-blocking-insight",
+      "title": "Render-blocking requests",
+      "score": 0.5,
+      "displayValue": null
+     }
+    ],
+    "opportunities": [
+     {
+      "id": "unused-javascript",
+      "title": "Reduce unused JavaScript",
+      "description": "Reduce unused JavaScript and defer loading scripts until they are required to decrease bytes consumed by network activity. [Learn how to reduce unused JavaScript](https://developer.chrome.com/docs/lighthouse/performance/unused-javascript/).",
+      "score": 0.5,
+      "scoreDisplayMode": "metricSavings",
+      "displayValue": "Est savings of 60 KiB",
+      "numericValue": null,
+      "numericUnit": "millisecond",
+      "savingsBytes": 61248,
+      "items": [
+       {
+        "url": "https://cense-decode.vercel.app/_next/static/chunks/0atut6a2uuyid.js",
+        "wastedBytes": 31500,
+        "wastedMs": null,
+        "totalBytes": 51437
+       },
+       {
+        "url": "https://cense-decode.vercel.app/_next/static/chunks/3n7dm2ojtyzwn.js",
+        "wastedBytes": 29748,
+        "wastedMs": null,
+        "totalBytes": 72425
+       }
+      ]
+     }
+    ],
+    "diagnostics": [],
+    "formFactor": "mobile",
+    "loadError": null
+   },
+   "runs": [
+    {
+     "run": 1,
+     "performance": 100,
+     "accessibility": 100,
+     "bestPractices": 100,
+     "seo": 100,
+     "lcp": 775.892,
+     "fcp": 775.892,
+     "cls": 0,
+     "tbt": 34,
+     "si": 775.892,
+     "tti": 1905.892,
+     "loadError": null
+    }
+   ]
+  },
+  "seeded-desktop": {
+   "page": "seeded",
+   "formFactor": "desktop",
+   "seeded": true,
+   "medianRun": 1,
+   "summary": {
+    "performance": 100,
+    "accessibility": 100,
+    "bestPractices": 100,
+    "seo": 100,
+    "lcp": 263.494,
+    "fcp": 263.494,
+    "cls": 0,
+    "tbt": 0,
+    "si": 273.407,
+    "tti": 263.494,
+    "inp": null,
+    "failing": [
+     {
+      "id": "unused-javascript",
+      "title": "Reduce unused JavaScript",
+      "score": 0.5,
+      "displayValue": "Est savings of 60 KiB"
+     },
+     {
+      "id": "legacy-javascript-insight",
+      "title": "Legacy JavaScript",
+      "score": 0.5,
+      "displayValue": "Est savings of 14 KiB"
+     },
+     {
+      "id": "network-dependency-tree-insight",
+      "title": "Network dependency tree",
+      "score": 0,
+      "displayValue": null
+     },
+     {
+      "id": "render-blocking-insight",
+      "title": "Render-blocking requests",
+      "score": 0.5,
+      "displayValue": null
+     }
+    ],
+    "opportunities": [
+     {
+      "id": "unused-javascript",
+      "title": "Reduce unused JavaScript",
+      "description": "Reduce unused JavaScript and defer loading scripts until they are required to decrease bytes consumed by network activity. [Learn how to reduce unused JavaScript](https://developer.chrome.com/docs/lighthouse/performance/unused-javascript/).",
+      "score": 0.5,
+      "scoreDisplayMode": "metricSavings",
+      "displayValue": "Est savings of 60 KiB",
+      "numericValue": null,
+      "numericUnit": "millisecond",
+      "savingsBytes": 61248,
+      "items": [
+       {
+        "url": "https://cense-decode.vercel.app/_next/static/chunks/0atut6a2uuyid.js",
+        "wastedBytes": 31500,
+        "wastedMs": null,
+        "totalBytes": 51437
+       },
+       {
+        "url": "https://cense-decode.vercel.app/_next/static/chunks/3n7dm2ojtyzwn.js",
+        "wastedBytes": 29748,
+        "wastedMs": null,
+        "totalBytes": 72425
+       }
+      ]
+     }
+    ],
+    "diagnostics": [],
+    "formFactor": "desktop",
+    "loadError": null
+   },
+   "runs": [
+    {
+     "run": 1,
+     "performance": 100,
+     "accessibility": 100,
+     "bestPractices": 100,
+     "seo": 100,
+     "lcp": 263.494,
+     "fcp": 263.494,
+     "cls": 0,
+     "tbt": 0,
+     "si": 273.407,
+     "tti": 263.494,
+     "loadError": null
+    }
+   ]
+  }
+ }
+}

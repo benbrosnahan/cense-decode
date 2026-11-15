@@ -1,0 +1,1265 @@
+{
+ "state": "loans",
+ "formFactor": "desktop",
+ "pageContext": {
+  "indexable": true,
+  "siteType": "saas"
+ },
+ "report": {
+  "uxScore": null,
+  "typographyScore": null,
+  "contrastScore": null,
+  "layoutScore": null,
+  "responsiveScore": null,
+  "navigationScore": null,
+  "contentScore": null,
+  "totalIssues": 5,
+  "p1Count": 0,
+  "p2Count": 5,
+  "p3Count": 0,
+  "findings": [
+   {
+    "id": "3b7fd22b-7fdf-491c-97d6-8d62a6660d35",
+    "severity": "P2",
+    "category": "Accessibility",
+    "device": "desktop",
+    "title": "8 pointer target(s) smaller than M3's comfortable 48×48px at 1440px wide",
+    "description": "8 pointer target(s) smaller than M3's comfortable 48×48px at 1440px wide — they clear the WCAG 2.5.8 24px minimum (1 via the inline exception). Examples: a.font-semibold.text-primary \"Cense\" (42×18px); a.rounded-md.text-brand-orange \"Cense\" (60×28px); button.min-h-11.rounded-full \"A past-due notice\" (151×44px). Measured at the 1440×900px desktop viewport.",
+    "recommendation": "Fix it once in the shared style or component that produces it, so every instance changes together.",
+    "source": "engine",
+    "themeId": "eng:tap-target-comfort",
+    "scope": "element",
+    "renderContext": "dom",
+    "observedOn": 1,
+    "sampleSize": 1,
+    "viewport": {
+     "width": 1440,
+     "height": 900,
+     "dpr": 1,
+     "isMobile": false
+    },
+    "wcagCriterion": "2.5.8",
+    "evidence": {
+     "measured": "42×18px",
+     "required": "≥48×48px",
+     "selector": "a.font-semibold.text-primary",
+     "sample": "Cense",
+     "count": 8
+    }
+   },
+   {
+    "id": "1113c0b6-16ce-4dbd-bb8f-e9c2f7f6c6e3",
+    "severity": "P2",
+    "category": "Accessibility",
+    "device": "desktop",
+    "title": "Missing landmark(s): nav.",
+    "description": "Missing landmark(s): nav.",
+    "recommendation": "Add the missing landmark elements (main, nav, header, footer) so assistive tech can navigate the page.",
+    "source": "engine",
+    "themeId": "eng:missing-landmarks",
+    "scope": "page",
+    "renderContext": "dom",
+    "observedOn": 1,
+    "sampleSize": 1,
+    "viewport": {
+     "width": 1440,
+     "height": 900,
+     "dpr": 1,
+     "isMobile": false
+    },
+    "evidence": {
+     "measured": "0 matches for nav, [role=\"navigation\"]",
+     "contributors": [
+      {
+       "selector": "nav, [role=\"navigation\"]",
+       "value": "no matching element"
+      }
+     ]
+    }
+   },
+   {
+    "id": "857d4014-ea05-483d-b299-852420506d85",
+    "severity": "P2",
+    "category": "Typography",
+    "device": "desktop",
+    "title": "5 reading-copy text node(s) below 16px (or any text below 11px).",
+    "description": "5 reading-copy text node(s) below 16px (or any text below 11px). Examples: p.text-sm.leading-relaxed \"Cover account numbers and your Social Se\" (14px); p.px-1.text-sm \"Nothing on hand? Try one of these.\" (14px); p.text-sm.font-semibold \"No account, no database, no tracking. We\" (14px). Measured at the 1440×900px desktop viewport.",
+    "recommendation": "Raise reading copy to at least 16px (12px absolute minimum for any text).",
+    "source": "engine",
+    "themeId": "eng:small-body-text",
+    "scope": "element",
+    "renderContext": "dom",
+    "observedOn": 1,
+    "sampleSize": 1,
+    "viewport": {
+     "width": 1440,
+     "height": 900,
+     "dpr": 1,
+     "isMobile": false
+    },
+    "evidence": {
+     "measured": "14px",
+     "required": "≥16px (≥11px absolute)",
+     "selector": "p.text-sm.leading-relaxed",
+     "sample": "Cover account numbers and your Social Se",
+     "count": 5
+    }
+   },
+   {
+    "id": "b42cf3de-c38b-4000-92ec-e228c865b6d0",
+    "severity": "P2",
+    "category": "Design Consistency",
+    "device": "desktop",
+    "title": "1 border-radius value(s) off the 7-step scale (0/4/8/12/16/28/full).",
+    "description": "1 border-radius value(s) off the 7-step scale (0/4/8/12/16/28/full).",
+    "recommendation": "Consolidate to a small token set: define CSS variables for the sanctioned values and replace ad-hoc ones.",
+    "source": "engine",
+    "themeId": "eng:radius-off-scale",
+    "scope": "page",
+    "renderContext": "dom",
+    "observedOn": 1,
+    "sampleSize": 1,
+    "viewport": {
+     "width": 1440,
+     "height": 900,
+     "dpr": 1,
+     "isMobile": false
+    },
+    "evidence": {
+     "measured": "0 matches for div.rounded-3xl.border-2",
+     "contributors": [
+      {
+       "selector": "div.rounded-3xl.border-2",
+       "value": "31px · 2 node(s)"
+      }
+     ]
+    }
+   },
+   {
+    "id": "1299b130-b9c5-44ce-8910-be3a07168357",
+    "severity": "P2",
+    "category": "Motion",
+    "device": "desktop",
+    "title": "1 animation/transition(s) under 50ms (non-instant but too fast to read).",
+    "description": "1 animation/transition(s) under 50ms (non-instant but too fast to read). Examples: *, ::before, ::after.",
+    "recommendation": "Keep animation durations within the 50–1000ms scale — long enough to read, short enough to feel responsive.",
+    "source": "engine",
+    "themeId": "eng:duration-too-short",
+    "scope": "element",
+    "renderContext": "dom",
+    "observedOn": 1,
+    "sampleSize": 1,
+    "viewport": {
+     "width": 1440,
+     "height": 900,
+     "dpr": 1,
+     "isMobile": false
+    },
+    "evidence": {
+     "measured": "1 occurrence(s)",
+     "required": "50–1000ms",
+     "selector": "*, ::before, ::after",
+     "count": 1
+    }
+   }
+  ],
+  "pageContext": {
+   "indexable": true,
+   "siteType": "saas"
+  },
+  "scanData": {
+   "domContext": {
+    "textElements": [
+     {
+      "tag": "p",
+      "text": "CenseDecode",
+      "fontSize": "20px",
+      "fontWeight": "700",
+      "lineHeight": "28px",
+      "color": "rgb(39, 91, 45)",
+      "backgroundColor": "rgba(0, 0, 0, 0)",
+      "contrastRatio": 2.62,
+      "x": 408,
+      "y": 30,
+      "width": 140,
+      "height": 28
+     },
+     {
+      "tag": "a",
+      "text": "Cense",
+      "fontSize": "20px",
+      "fontWeight": "700",
+      "lineHeight": "28px",
+      "color": "rgb(168, 83, 31)",
+      "backgroundColor": "rgba(0, 0, 0, 0)",
+      "contrastRatio": 3.92,
+      "x": 408,
+      "y": 30,
+      "width": 60,
+      "height": 28
+     },
+     {
+      "tag": "span",
+      "text": "Decode",
+      "fontSize": "20px",
+      "fontWeight": "700",
+      "lineHeight": "28px",
+      "color": "rgb(39, 91, 45)",
+      "backgroundColor": "rgba(0, 0, 0, 0)",
+      "contrastRatio": 2.62,
+      "x": 474,
+      "y": 30,
+      "width": 74,
+      "height": 28
+     },
+     {
+      "tag": "span",
+      "text": "Nothing stored",
+      "fontSize": "13px",
+      "fontWeight": "600",
+      "lineHeight": "19.2px",
+      "color": "rgb(39, 91, 45)",
+      "backgroundColor": "rgb(234, 243, 231)",
+      "contrastRatio": 7.05,
+      "x": 896,
+      "y": 28,
+      "width": 136,
+      "height": 31
+     },
+     {
+      "tag": "h1",
+      "text": "Put the confusing money thing here.",
+      "fontSize": "60px",
+      "fontWeight": "700",
+      "lineHeight": "62.4px",
+      "color": "rgb(39, 91, 45)",
+      "backgroundColor": "rgba(0, 0, 0, 0)",
+      "contrastRatio": 2.62,
+      "x": 408,
+      "y": 107,
+      "width": 624,
+      "height": 125
+     },
+     {
+      "tag": "p",
+      "text": "A loan email, a card offer, a line on a statement.",
+      "fontSize": "18px",
+      "fontWeight": "400",
+      "lineHeight": "29.25px",
+      "color": "rgb(58, 107, 62)",
+      "backgroundColor": "rgba(0, 0, 0, 0)",
+      "contrastRatio": 3.35,
+      "x": 408,
+      "y": 248,
+      "width": 576,
+      "height": 88
+     },
+     {
+      "tag": "label",
+      "text": "What you want decoded",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "lineHeight": "24px",
+      "color": "rgb(39, 91, 45)",
+      "backgroundColor": "rgba(0, 0, 0, 0)",
+      "contrastRatio": 2.62,
+      "x": 409,
+      "y": 361,
+      "width": 1,
+      "height": 1
+     },
+     {
+      "tag": "button",
+      "text": "Add a screenshot",
+      "fontSize": "14px",
+      "fontWeight": "600",
+      "lineHeight": "20px",
+      "color": "rgb(39, 91, 45)",
+      "backgroundColor": "rgb(255, 255, 255)",
+      "contrastRatio": 8.01,
+      "x": 422,
+      "y": 531,
+      "width": 171,
+      "height": 40
+     },
+     {
+      "tag": "p",
+      "text": "Cover account numbers and your Social Security num",
+      "fontSize": "14px",
+      "fontWeight": "400",
+      "lineHeight": "22.75px",
+      "color": "rgb(74, 110, 77)",
+      "backgroundColor": "rgba(0, 0, 0, 0)",
+      "contrastRatio": 3.63,
+      "x": 412,
+      "y": 595,
+      "width": 616,
+      "height": 46
+     },
+     {
+      "tag": "button",
+      "text": "Decode it",
+      "fontSize": "18px",
+      "fontWeight": "600",
+      "lineHeight": "28px",
+      "color": "rgb(255, 255, 255)",
+      "backgroundColor": "rgb(39, 91, 45)",
+      "contrastRatio": 8.01,
+      "x": 408,
+      "y": 652,
+      "width": 624,
+      "height": 56
+     },
+     {
+      "tag": "p",
+      "text": "Nothing on hand? Try one of these.",
+      "fontSize": "14px",
+      "fontWeight": "600",
+      "lineHeight": "20px",
+      "color": "rgb(39, 91, 45)",
+      "backgroundColor": "rgba(0, 0, 0, 0)",
+      "contrastRatio": 2.62,
+      "x": 408,
+      "y": 732,
+      "width": 624,
+      "height": 20
+     },
+     {
+      "tag": "button",
+      "text": "A credit card offer",
+      "fontSize": "14px",
+      "fontWeight": "600",
+      "lineHeight": "20px",
+      "color": "rgb(39, 91, 45)",
+      "backgroundColor": "rgb(255, 255, 255)",
+      "contrastRatio": 8.01,
+      "x": 408,
+      "y": 762,
+      "width": 153,
+      "height": 44
+     },
+     {
+      "tag": "button",
+      "text": "A past-due notice",
+      "fontSize": "14px",
+      "fontWeight": "600",
+      "lineHeight": "20px",
+      "color": "rgb(39, 91, 45)",
+      "backgroundColor": "rgb(255, 255, 255)",
+      "contrastRatio": 8.01,
+      "x": 569,
+      "y": 762,
+      "width": 151,
+      "height": 44
+     },
+     {
+      "tag": "button",
+      "text": "“No interest if paid in full”",
+      "fontSize": "14px",
+      "fontWeight": "600",
+      "lineHeight": "20px",
+      "color": "rgb(39, 91, 45)",
+      "backgroundColor": "rgb(255, 255, 255)",
+      "contrastRatio": 8.01,
+      "x": 728,
+      "y": 762,
+      "width": 201,
+      "height": 44
+     },
+     {
+      "tag": "button",
+      "text": "A text that feels off",
+      "fontSize": "14px",
+      "fontWeight": "600",
+      "lineHeight": "20px",
+      "color": "rgb(39, 91, 45)",
+      "backgroundColor": "rgb(255, 255, 255)",
+      "contrastRatio": 8.01,
+      "x": 408,
+      "y": 814,
+      "width": 159,
+      "height": 44
+     },
+     {
+      "tag": "button",
+      "text": "A word I keep seeing",
+      "fontSize": "14px",
+      "fontWeight": "600",
+      "lineHeight": "20px",
+      "color": "rgb(39, 91, 45)",
+      "backgroundColor": "rgb(255, 255, 255)",
+      "contrastRatio": 8.01,
+      "x": 575,
+      "y": 814,
+      "width": 168,
+      "height": 44
+     },
+     {
+      "tag": "p",
+      "text": "No account, no database, no tracking. We do not ke",
+      "fontSize": "14px",
+      "fontWeight": "600",
+      "lineHeight": "22.75px",
+      "color": "rgb(39, 91, 45)",
+      "backgroundColor": "rgba(0, 0, 0, 0)",
+      "contrastRatio": 2.62,
+      "x": 408,
+      "y": 947,
+      "width": 624,
+      "height": 23
+     },
+     {
+      "tag": "p",
+      "text": "To decode something, the text or image you submit ",
+      "fontSize": "14px",
+      "fontWeight": "400",
+      "lineHeight": "22.75px",
+      "color": "rgb(74, 110, 77)",
+      "backgroundColor": "rgba(0, 0, 0, 0)",
+      "contrastRatio": 3.63,
+      "x": 408,
+      "y": 978,
+      "width": 624,
+      "height": 68
+     },
+     {
+      "tag": "p",
+      "text": "Built by Cense, for students, by students.",
+      "fontSize": "14px",
+      "fontWeight": "400",
+      "lineHeight": "20px",
+      "color": "rgb(74, 110, 77)",
+      "backgroundColor": "rgba(0, 0, 0, 0)",
+      "contrastRatio": 3.63,
+      "x": 408,
+      "y": 1054,
+      "width": 624,
+      "height": 20
+     },
+     {
+      "tag": "a",
+      "text": "Cense",
+      "fontSize": "14px",
+      "fontWeight": "600",
+      "lineHeight": "20px",
+      "color": "rgb(39, 91, 45)",
+      "backgroundColor": "rgba(0, 0, 0, 0)",
+      "contrastRatio": 2.62,
+      "x": 458,
+      "y": 1055,
+      "width": 42,
+      "height": 18
+     }
+    ],
+    "interactiveElements": [
+     {
+      "tag": "a",
+      "text": "Cense",
+      "width": 60,
+      "height": 28,
+      "x": 408,
+      "y": 30
+     },
+     {
+      "tag": "button",
+      "text": "Add a screenshot",
+      "width": 171,
+      "height": 40,
+      "x": 422,
+      "y": 531
+     },
+     {
+      "tag": "button",
+      "text": "Decode it",
+      "width": 624,
+      "height": 56,
+      "x": 408,
+      "y": 652
+     },
+     {
+      "tag": "button",
+      "text": "A credit card offer",
+      "width": 153,
+      "height": 44,
+      "x": 408,
+      "y": 762
+     },
+     {
+      "tag": "button",
+      "text": "A past-due notice",
+      "width": 151,
+      "height": 44,
+      "x": 569,
+      "y": 762
+     },
+     {
+      "tag": "button",
+      "text": "“No interest if paid in full”",
+      "width": 201,
+      "height": 44,
+      "x": 728,
+      "y": 762
+     },
+     {
+      "tag": "button",
+      "text": "A text that feels off",
+      "width": 159,
+      "height": 44,
+      "x": 408,
+      "y": 814
+     },
+     {
+      "tag": "button",
+      "text": "A word I keep seeing",
+      "width": 168,
+      "height": 44,
+      "x": 575,
+      "y": 814
+     },
+     {
+      "tag": "a",
+      "text": "Cense",
+      "width": 42,
+      "height": 18,
+      "x": 458,
+      "y": 1055
+     }
+    ],
+    "images": [],
+    "headings": [
+     {
+      "tag": "h1",
+      "text": "Put the confusing money thing here.",
+      "fontSize": "60px",
+      "x": 408,
+      "y": 107,
+      "width": 624,
+      "height": 125
+     }
+    ],
+    "overflowElements": [
+     "label.sr-only",
+     "input.sr-only"
+    ],
+    "stickyElements": [],
+    "documentDimensions": {
+     "scrollHeight": 1098,
+     "clientHeight": 900,
+     "scrollWidth": 1440,
+     "clientWidth": 1440
+    }
+   }
+  }
+ },
+ "design": {
+  "report": {
+   "score": 85,
+   "grade": "B",
+   "buckets": {
+    "accessibility": {
+     "score": 22.8,
+     "max": 30,
+     "findings": [
+      {
+       "severity": "warn",
+       "ruleId": "tap-target-comfort",
+       "message": "8 pointer target(s) smaller than M3's comfortable 48×48px at 1440px wide — they clear the WCAG 2.5.8 24px minimum (1 via the inline exception).",
+       "count": 8,
+       "examples": [
+        {
+         "sig": "a.font-semibold.text-primary",
+         "tag": "a",
+         "w": 42,
+         "h": 18,
+         "sample": "Cense",
+         "viewport": {
+          "width": 1440,
+          "height": 900,
+          "dpr": 1,
+          "isMobile": false,
+          "w": 1440,
+          "h": 900
+         },
+         "exception": "inline"
+        },
+        {
+         "sig": "a.rounded-md.text-brand-orange",
+         "tag": "a",
+         "w": 60,
+         "h": 28,
+         "sample": "Cense",
+         "viewport": {
+          "width": 1440,
+          "height": 900,
+          "dpr": 1,
+          "isMobile": false,
+          "w": 1440,
+          "h": 900
+         }
+        },
+        {
+         "sig": "button.min-h-11.rounded-full",
+         "tag": "button",
+         "w": 151,
+         "h": 44,
+         "sample": "A past-due notice",
+         "viewport": {
+          "width": 1440,
+          "height": 900,
+          "dpr": 1,
+          "isMobile": false,
+          "w": 1440,
+          "h": 900
+         }
+        },
+        {
+         "sig": "button.min-h-11.rounded-full",
+         "tag": "button",
+         "w": 153,
+         "h": 44,
+         "sample": "A credit card offer",
+         "viewport": {
+          "width": 1440,
+          "height": 900,
+          "dpr": 1,
+          "isMobile": false,
+          "w": 1440,
+          "h": 900
+         }
+        },
+        {
+         "sig": "button.inline-flex.shrink-0",
+         "tag": "button",
+         "w": 171,
+         "h": 40,
+         "sample": "Add a screenshot",
+         "viewport": {
+          "width": 1440,
+          "height": 900,
+          "dpr": 1,
+          "isMobile": false,
+          "w": 1440,
+          "h": 900
+         }
+        },
+        {
+         "sig": "button.min-h-11.rounded-full",
+         "tag": "button",
+         "w": 159,
+         "h": 44,
+         "sample": "A text that feels off",
+         "viewport": {
+          "width": 1440,
+          "height": 900,
+          "dpr": 1,
+          "isMobile": false,
+          "w": 1440,
+          "h": 900
+         }
+        },
+        {
+         "sig": "button.min-h-11.rounded-full",
+         "tag": "button",
+         "w": 168,
+         "h": 44,
+         "sample": "A word I keep seeing",
+         "viewport": {
+          "width": 1440,
+          "height": 900,
+          "dpr": 1,
+          "isMobile": false,
+          "w": 1440,
+          "h": 900
+         }
+        },
+        {
+         "sig": "button.min-h-11.rounded-full",
+         "tag": "button",
+         "w": 201,
+         "h": 44,
+         "sample": "“No interest if paid in full”",
+         "viewport": {
+          "width": 1440,
+          "height": 900,
+          "dpr": 1,
+          "isMobile": false,
+          "w": 1440,
+          "h": 900
+         }
+        }
+       ],
+       "scope": "element",
+       "required": "≥48×48px",
+       "viewport": {
+        "width": 1440,
+        "height": 900,
+        "dpr": 1,
+        "isMobile": false,
+        "w": 1440,
+        "h": 900
+       },
+       "wcagCriterion": "2.5.8"
+      },
+      {
+       "severity": "warn",
+       "ruleId": "missing-landmarks",
+       "message": "Missing landmark(s): nav.",
+       "landmarks": [
+        "nav"
+       ],
+       "scope": "page",
+       "contributors": [
+        {
+         "selector": "nav, [role=\"navigation\"]",
+         "value": "no matching element"
+        }
+       ]
+      }
+     ]
+    },
+    "consistency": {
+     "score": 15.2,
+     "max": 20,
+     "findings": [
+      {
+       "severity": "warn",
+       "ruleId": "small-body-text",
+       "message": "5 reading-copy text node(s) below 16px (or any text below 11px).",
+       "count": 5,
+       "examples": [
+        {
+         "sig": "p.text-sm.leading-relaxed",
+         "px": 14,
+         "sample": "Cover account numbers and your Social Se"
+        },
+        {
+         "sig": "p.px-1.text-sm",
+         "px": 14,
+         "sample": "Nothing on hand? Try one of these."
+        },
+        {
+         "sig": "p.text-sm.font-semibold",
+         "px": 14,
+         "sample": "No account, no database, no tracking. We"
+        },
+        {
+         "sig": "p.mt-2.text-sm",
+         "px": 14,
+         "sample": "To decode something, the text or image y"
+        },
+        {
+         "sig": "p.mt-2.text-sm",
+         "px": 14,
+         "sample": "Built by Cense, for students, by student"
+        }
+       ],
+       "scope": "element",
+       "renderContext": "dom",
+       "required": "≥16px (≥11px absolute)",
+       "viewport": {
+        "width": 1440,
+        "height": 900,
+        "dpr": 1,
+        "isMobile": false,
+        "w": 1440,
+        "h": 900
+       }
+      },
+      {
+       "severity": "info",
+       "ruleId": "small-ui-labels",
+       "message": "9 UI label(s) at 12-15.9px — legitimate M3 label roles (not scored); verify their tap targets meet 48px.",
+       "count": 9,
+       "examples": [
+        {
+         "sig": "span.inline-flex.items-center",
+         "px": 13,
+         "sample": "Nothing stored"
+        },
+        {
+         "sig": "button.inline-flex.shrink-0",
+         "px": 14,
+         "sample": "Add a screenshot"
+        },
+        {
+         "sig": "strong.font-semibold.text-foreground",
+         "px": 14,
+         "sample": "Cover account numbers and your Social Se"
+        },
+        {
+         "sig": "button.min-h-11.rounded-full",
+         "px": 14,
+         "sample": "A credit card offer"
+        },
+        {
+         "sig": "button.min-h-11.rounded-full",
+         "px": 14,
+         "sample": "A past-due notice"
+        },
+        {
+         "sig": "button.min-h-11.rounded-full",
+         "px": 14,
+         "sample": "“No interest if paid in full”"
+        }
+       ],
+       "scope": "element",
+       "renderContext": "dom",
+       "viewport": {
+        "width": 1440,
+        "height": 900,
+        "dpr": 1,
+        "isMobile": false,
+        "w": 1440,
+        "h": 900
+       }
+      },
+      {
+       "severity": "warn",
+       "ruleId": "radius-off-scale",
+       "message": "1 border-radius value(s) off the 7-step scale (0/4/8/12/16/28/full).",
+       "values": [
+        31
+       ],
+       "scope": "page",
+       "viewport": {
+        "width": 1440,
+        "height": 900,
+        "dpr": 1,
+        "isMobile": false,
+        "w": 1440,
+        "h": 900
+       },
+       "contributors": [
+        {
+         "selector": "div.rounded-3xl.border-2",
+         "value": "31px · 2 node(s)"
+        }
+       ]
+      }
+     ]
+    },
+    "motion": {
+     "score": 22,
+     "max": 25,
+     "findings": [
+      {
+       "severity": "warn",
+       "ruleId": "duration-too-short",
+       "message": "1 animation/transition(s) under 50ms (non-instant but too fast to read).",
+       "examples": [
+        {
+         "selector": "*, ::before, ::after",
+         "sig": "*, ::before, ::after",
+         "ms": 0
+        }
+       ],
+       "scope": "element",
+       "required": "50–1000ms"
+      }
+     ]
+    },
+    "performance": {
+     "score": 25,
+     "max": 25,
+     "findings": []
+    }
+   },
+   "sections": {
+    "color": {
+     "sampled": 20,
+     "skippedUnknownBg": 0,
+     "skippedUnparseable": 0,
+     "skippedRenderContext": 0,
+     "distinctTextColors": 5,
+     "failureCount": 0,
+     "failures": []
+    },
+    "typography": {
+     "distinctFamilies": 2,
+     "families": [
+      "\"Bricolage Grotesque\", \"Bricolage Grotesque Fallback\", \"Instrument Sans\", \"Instrument Sans Fallback\", system-ui, sans-serif",
+      "\"Instrument Sans\", \"Instrument Sans Fallback\", system-ui, sans-serif"
+     ],
+     "distinctSizes": 6,
+     "sizes": [
+      13,
+      14,
+      16,
+      18,
+      20,
+      60
+     ],
+     "distinctLineHeights": 7,
+     "smallBodyCount": 5,
+     "smallBody": [
+      {
+       "sig": "p.text-sm.leading-relaxed",
+       "px": 14,
+       "sample": "Cover account numbers and your Social Se"
+      },
+      {
+       "sig": "p.px-1.text-sm",
+       "px": 14,
+       "sample": "Nothing on hand? Try one of these."
+      },
+      {
+       "sig": "p.text-sm.font-semibold",
+       "px": 14,
+       "sample": "No account, no database, no tracking. We"
+      },
+      {
+       "sig": "p.mt-2.text-sm",
+       "px": 14,
+       "sample": "To decode something, the text or image y"
+      },
+      {
+       "sig": "p.mt-2.text-sm",
+       "px": 14,
+       "sample": "Built by Cense, for students, by student"
+      }
+     ],
+     "smallLabelCount": 9,
+     "smallLabels": [
+      {
+       "sig": "span.inline-flex.items-center",
+       "px": 13,
+       "sample": "Nothing stored"
+      },
+      {
+       "sig": "button.inline-flex.shrink-0",
+       "px": 14,
+       "sample": "Add a screenshot"
+      },
+      {
+       "sig": "strong.font-semibold.text-foreground",
+       "px": 14,
+       "sample": "Cover account numbers and your Social Se"
+      },
+      {
+       "sig": "button.min-h-11.rounded-full",
+       "px": 14,
+       "sample": "A credit card offer"
+      },
+      {
+       "sig": "button.min-h-11.rounded-full",
+       "px": 14,
+       "sample": "A past-due notice"
+      },
+      {
+       "sig": "button.min-h-11.rounded-full",
+       "px": 14,
+       "sample": "“No interest if paid in full”"
+      },
+      {
+       "sig": "button.min-h-11.rounded-full",
+       "px": 14,
+       "sample": "A text that feels off"
+      },
+      {
+       "sig": "button.min-h-11.rounded-full",
+       "px": 14,
+       "sample": "A word I keep seeing"
+      },
+      {
+       "sig": "a.font-semibold.text-primary",
+       "px": 14,
+       "sample": "Cense"
+      }
+     ],
+     "tightLeadingCount": 0,
+     "tightLeading": [],
+     "displayLeadingRelaxed": 0,
+     "formattedBlocksSkipped": 0,
+     "distinctHeadingSizes": 1,
+     "headingCount": 1,
+     "skippedRenderContext": 0
+    },
+    "shape": {
+     "distinctRadii": 3,
+     "radii": [
+      11,
+      31,
+      9999
+     ],
+     "scale": [
+      0,
+      4,
+      8,
+      12,
+      16,
+      28,
+      9999
+     ],
+     "offScaleValues": [
+      31
+     ]
+    },
+    "elevation": {
+     "distinctShadows": 1,
+     "levels": 6,
+     "recipes": [
+      "rgba(39, 91, 45, 0.04) 0px 1px 0px 0px, rgba(39, 91, 45, 0.18) 0px 8px 24px -12px"
+     ]
+    },
+    "states": {
+     "interactiveCount": 10,
+     "hasHoverRules": true,
+     "hasFocusVisibleRules": true,
+     "stylesheetsReachable": true,
+     "sheetsSkipped": 0,
+     "noVisibleFocusCount": 0,
+     "noVisibleFocusExamples": []
+    },
+    "motion": {
+     "hasReducedMotionQuery": true,
+     "reducedMotionStatus": "present",
+     "activeAnimations": 0,
+     "tooShort": [
+      {
+       "selector": "*, ::before, ::after",
+       "sig": "*, ::before, ::after",
+       "ms": 0
+      }
+     ],
+     "tooLong": [],
+     "linearMovement": [],
+     "easeInEntrance": [],
+     "layoutAnimated": [],
+     "infiniteLoops": [],
+     "sheetsSkipped": 0
+    },
+    "a11yLayout": {
+     "smallTargetCount": 8,
+     "smallTargets": [
+      {
+       "sig": "a.font-semibold.text-primary",
+       "tag": "a",
+       "w": 42,
+       "h": 18,
+       "sample": "Cense",
+       "viewport": {
+        "width": 1440,
+        "height": 900,
+        "dpr": 1,
+        "isMobile": false,
+        "w": 1440,
+        "h": 900
+       },
+       "exception": "inline"
+      },
+      {
+       "sig": "a.rounded-md.text-brand-orange",
+       "tag": "a",
+       "w": 60,
+       "h": 28,
+       "sample": "Cense",
+       "viewport": {
+        "width": 1440,
+        "height": 900,
+        "dpr": 1,
+        "isMobile": false,
+        "w": 1440,
+        "h": 900
+       }
+      },
+      {
+       "sig": "button.min-h-11.rounded-full",
+       "tag": "button",
+       "w": 151,
+       "h": 44,
+       "sample": "A past-due notice",
+       "viewport": {
+        "width": 1440,
+        "height": 900,
+        "dpr": 1,
+        "isMobile": false,
+        "w": 1440,
+        "h": 900
+       }
+      },
+      {
+       "sig": "button.min-h-11.rounded-full",
+       "tag": "button",
+       "w": 153,
+       "h": 44,
+       "sample": "A credit card offer",
+       "viewport": {
+        "width": 1440,
+        "height": 900,
+        "dpr": 1,
+        "isMobile": false,
+        "w": 1440,
+        "h": 900
+       }
+      },
+      {
+       "sig": "button.inline-flex.shrink-0",
+       "tag": "button",
+       "w": 171,
+       "h": 40,
+       "sample": "Add a screenshot",
+       "viewport": {
+        "width": 1440,
+        "height": 900,
+        "dpr": 1,
+        "isMobile": false,
+        "w": 1440,
+        "h": 900
+       }
+      },
+      {
+       "sig": "button.min-h-11.rounded-full",
+       "tag": "button",
+       "w": 159,
+       "h": 44,
+       "sample": "A text that feels off",
+       "viewport": {
+        "width": 1440,
+        "height": 900,
+        "dpr": 1,
+        "isMobile": false,
+        "w": 1440,
+        "h": 900
+       }
+      },
+      {
+       "sig": "button.min-h-11.rounded-full",
+       "tag": "button",
+       "w": 168,
+       "h": 44,
+       "sample": "A word I keep seeing",
+       "viewport": {
+        "width": 1440,
+        "height": 900,
+        "dpr": 1,
+        "isMobile": false,
+        "w": 1440,
+        "h": 900
+       }
+      },
+      {
+       "sig": "button.min-h-11.rounded-full",
+       "tag": "button",
+       "w": 201,
+       "h": 44,
+       "sample": "“No interest if paid in full”",
+       "viewport": {
+        "width": 1440,
+        "height": 900,
+        "dpr": 1,
+        "isMobile": false,
+        "w": 1440,
+        "h": 900
+       }
+      }
+     ],
+     "undersizedCount": 0,
+     "belowComfortCount": 8,
+     "spacingExceptionChecked": true,
+     "spacingExceptionSkipReason": null,
+     "targetCount": 9,
+     "missingAltCount": 0,
+     "missingAlt": [],
+     "headingJumpCount": 0,
+     "headingJumps": [],
+     "h1Count": 1,
+     "missingLandmarks": [
+      "nav"
+     ]
+    }
+   },
+   "notAutoDetectable": [
+    "Spatial coherence — whether elements enter/exit from where they logically belong (a menu growing from its anchor, a sheet rising from the edge it docks to). The audit sees durations and easings, not spatial origin.",
+    "Clean fades — whether opacity transitions are free of mid-fade color shifts, banding, or double-compositing. Only a human eye (or pixel diff) can judge fade quality.",
+    "Jump cuts — abrupt state changes with no transition where one is expected (content swaps, route changes). Absence of animation is not itself in the DOM.",
+    "Unified direction — whether a group of elements animates along a consistent axis/choreography rather than each doing its own thing.",
+    "Perceived hierarchy / emphasis — whether motion draws the eye to the right thing at the right time.",
+    "Content-appropriate personality — expressive vs. standard scheme being the right call for the brand and context.",
+    "Interruptibility & continuity — whether in-flight animations respond gracefully to new input rather than snapping.",
+    "Real contrast under imagery/gradients — text over photos or gradient backgrounds (the audit samples solid computed backgrounds only).",
+    "Closed shadow roots — their internals are structurally unreachable from script and are not scanned."
+   ],
+   "meta": {
+    "url": "https://cense-decode.vercel.app/",
+    "title": "Decode by Cense",
+    "timestamp": "2026-11-15T18:45:34.038Z",
+    "contentFingerprint": "9ftqla",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+    "viewport": {
+     "width": 1440,
+     "height": 900,
+     "dpr": 1,
+     "isMobile": false,
+     "w": 1440,
+     "h": 900
+    },
+    "siteType": "saas",
+    "elementsScanned": 36,
+    "elementsTotal": 50,
+    "sampleCap": 1500,
+    "sampleCapped": false,
+    "sheetsSkipped": 0,
+    "openShadowRoots": 1,
+    "notes": [
+     "1 open shadow root(s) traversed. Closed shadow roots (if any) cannot be scanned."
+    ],
+    "durationMs": 7
+   }
+  },
+  "probes": {
+   "animationsAtLoad": {
+    "count": 0,
+    "running": 0,
+    "anims": []
+   },
+   "animationsAfterScroll": {
+    "count": 0,
+    "running": 0,
+    "anims": []
+   },
+   "hoverProbe": [
+    {
+     "label": "Cense",
+     "selector": "a.rounded-md",
+     "changes": false
+    },
+    {
+     "label": "Add a screenshot",
+     "selector": "button.inline-flex",
+     "changes": true
+    },
+    {
+     "label": "Decode it",
+     "selector": "button.inline-flex",
+     "changes": true
+    },
+    {
+     "label": "A credit card offer",
+     "selector": "button.min-h-11",
+     "changes": true
+    },
+    {
+     "label": "A past-due notice",
+     "selector": "button.min-h-11",
+     "changes": true
+    },
+    {
+     "label": "“No interest if paid in full”",
+     "selector": "button.min-h-11",
+     "changes": true
+    }
+   ],
+   "reducedMotion": {
+    "emulated": true,
+    "snapshot": {
+     "count": 0,
+     "running": 0,
+     "anims": []
+    },
+    "ungatedCount": 0
+   }
+  },
+  "durationMs": 2237
+ },
+ "extras": []
+}
