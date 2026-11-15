@@ -38,6 +38,14 @@ const GREEN = {
 export const SCENARIOS = {
   // A normal decode, chosen by input (see pick()).
   ok: { input: GENERIC },
+  // A red read, as for a real past-due notice.
+  red: {
+    input: {
+      ...GENERIC,
+      worry: { level: 'red', headline: 'This has a real cost and a clock.', basedOn: ['32 days past due.'] },
+      topic: 'credit-card',
+    },
+  },
   // The model returns green. Whether that survives depends on the input's wording.
   green: { input: GREEN },
   // Green again, but the model's own explanation names a scam cue. For screenshots, where the server never sees

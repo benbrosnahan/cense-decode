@@ -60,7 +60,7 @@ export interface DecodeResult {
    * decision (a card/loan offer, a product). Omitted for pure definitions and scams.
    */
   considerations?: string[];
-  /** Present when the topic is investing. */
+  /** Another Cense tool for this topic. Never set on a red read. */
   goDeeper?: GoDeeper;
   /** Always names who to double-check with. */
   disclaimer: string;

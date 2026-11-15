@@ -138,9 +138,14 @@ export function normalizeResult(raw: unknown, sourceText: string): DecodeResult 
     : [];
   const jargon = cleanJargon(r.jargon);
 
+  const read = normalizeWorry(worry, sourceText, { plainLanguage: r.plainLanguage, jargon });
+
   // Derive the deeper-tool suggestion deterministically from the model's topic
   // classification (a required enum, far more reliable than an optional object).
-  const route = r.topic ? TOPIC_TO_ROUTE[r.topic] ?? null : null;
+  // A red read gets none: the one next step is the whole answer, and a past-due
+  // notice classed as "credit-card" was being offered a card picker.
+  const route =
+    r.topic && read.level !== "red" ? TOPIC_TO_ROUTE[r.topic] ?? null : null;
   const goDeeper = route
     ? { route, label: ROUTE_TARGETS[route].defaultLabel }
     : undefined;
@@ -148,7 +153,7 @@ export function normalizeResult(raw: unknown, sourceText: string): DecodeResult 
   return {
     plainLanguage: r.plainLanguage as string,
     analogy: nonEmpty(r.analogy) ? r.analogy : "",
-    worry: normalizeWorry(worry, sourceText, { plainLanguage: r.plainLanguage, jargon }),
+    worry: read,
     jargon,
     nextStep: r.nextStep as string,
     considerations: considerations.length > 0 ? considerations : undefined,

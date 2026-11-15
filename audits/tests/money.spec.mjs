@@ -1,5 +1,5 @@
 // Money and claims: the urgency read a student acts on, results that are not complete, the model's
-// instructions, and where "go deeper" sends a student (MONEY-01 to MONEY-04 in audits/REPORT.md).
+// instructions, and where "go deeper" sends a student (MONEY-01 to MONEY-05 in audits/REPORT.md).
 //
 // The scam and urgency oracle below is written from the regulators' own descriptions, not from the app's pattern
 // list, and each message is phrased the way the real thing reads:
@@ -114,6 +114,15 @@ for (const [topic, url] of DEEPER) {
     await expect(link).toHaveAttribute('rel', /noopener/);
   });
 }
+
+test('MONEY-05 a red result offers no other tool: a past-due notice never suggests a new credit card', async ({ page }) => {
+  needsMock();
+  // The live model, 2026-11-15, read the past-due example as red with topic credit-card, and the page offered
+  // "Find the credit card that fits you" under "pay at least the minimum today".
+  await decodeText(page, 'Your account is 32 days past due. A late fee of $39.00 has been assessed. [[mock:red]]');
+  expect(await urgencyWord(page)).toBe('Higher');
+  await expect(page.getByRole('link', { name: /another free cense tool/i })).toHaveCount(0);
+});
 
 for (const topic of ['general-finance', 'none']) {
   test(`no go-deeper link is shown for ${topic}`, async ({ page }) => {

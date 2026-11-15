@@ -49,7 +49,7 @@ topic: REQUIRED. Classify the input into exactly one of these, so we can suggest
 - "investing": stocks, ETFs, funds, brokerage or portfolio screens, diversifying, returns.
 - "job-offer": a job offer, salary, or comparing compensation.
 - "student-loan": student loans or loan repayment plans.
-- "credit-card": choosing, comparing, or being offered a credit card.
+- "credit-card": choosing, comparing, or being offered a new credit card. A bill, statement, late notice or fee on a card they already have is "general-finance".
 - "purchase-decision": deciding whether to buy a specific thing.
 - "general-finance": general "what should I do with my money", budgeting, or overall financial planning with no single product in focus.
 - "none": ONLY for a pure scam, or a bare vocabulary definition with no decision behind it that fits none of the above. When in doubt, pick the closest topic rather than "none".
