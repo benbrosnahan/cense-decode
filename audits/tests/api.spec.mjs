@@ -53,6 +53,9 @@ test('SEC-04 every answer from the route says no-store, so no cache keeps a stud
 });
 
 test('a sixth decode inside a minute from one address is turned away with 429', async ({ request }) => {
+  // Each test fakes its own address with x-forwarded-for. Vercel overwrites that header with the real one, so on a
+  // deployment every test shares one address and the count is already used up. The firewall rule covers live traffic.
+  test.skip(!!process.env.AUDIT_URL, 'Local only: a deployment ignores the faked address.');
   const ip = freshIp();
   const statuses = [];
   // Empty text costs nothing, and still counts against the limit.
