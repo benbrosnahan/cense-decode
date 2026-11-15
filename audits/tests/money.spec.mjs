@@ -11,7 +11,7 @@
 // The stand-in API is told to call every one of them green, the worst case for a model. The server must never
 // let that through as calm.
 import { readFileSync } from 'node:fs';
-import { test, expect, knownIssue, needsMock, decodeText, urgencyWord, urgencyHeadline, postDecode, finalOf } from './helpers.mjs';
+import { test, expect, needsMock, decodeText, urgencyWord, urgencyHeadline, postDecode, finalOf } from './helpers.mjs';
 
 const MODEL_GREEN_HEADLINE = 'Nothing here to act on, you can relax.';
 
@@ -31,7 +31,6 @@ const SCAM_AND_URGENCY = [
 for (const [name, text] of SCAM_AND_URGENCY) {
   test(`MONEY-01 scam or urgency wording never comes back calm: ${name}`, async ({ page }) => {
     needsMock();
-    knownIssue('MONEY-01');
     await decodeText(page, `${text} [[mock:green]]`);
     expect(await urgencyWord(page)).not.toBe('Low');
     // Lifting the level is not enough if the headline still says relax.
@@ -41,7 +40,6 @@ for (const [name, text] of SCAM_AND_URGENCY) {
 
 test('MONEY-01 a screenshot is checked too: the model\'s own explanation of a gift card demand is never calm', async ({ request }) => {
   needsMock();
-  knownIssue('MONEY-01');
   // A 1x1 white PNG. The server never reads the pixels, only what the model says about them.
   const png = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==';
   const res = await postDecode(request, {
@@ -62,7 +60,6 @@ test('the clamp does not fire on ordinary words: a plain question the model call
 
 test('MONEY-02 a decode cut off at the token cap is shown as a failure, not as a finished result', async ({ page }) => {
   needsMock();
-  knownIssue('MONEY-02');
   await decodeText(page, 'A short bill. [[mock:max-tokens]]');
   await expect(page.getByRole('button', { name: /try again/i })).toBeVisible();
   await expect(page.getByText(/could not read that/i)).toBeVisible();
@@ -70,7 +67,6 @@ test('MONEY-02 a decode cut off at the token cap is shown as a failure, not as a
 
 test('MONEY-02 a cut inside the urgency read never shows an urgency level nobody wrote', async ({ request }) => {
   needsMock();
-  knownIssue('MONEY-02');
   const final = finalOf(await (await postDecode(request, { text: 'A short bill. [[mock:max-tokens-early]]' })).text());
   expect(final.failure).toBe('unavailable');
 });
@@ -85,18 +81,15 @@ test('a refusal partway through is shown as a failure', async ({ page }) => {
 const prompt = readFileSync(new URL('../../src/lib/prompt.ts', import.meta.url), 'utf8');
 
 test('MONEY-03 the prompt tells the model not to state rates, limits or plan rules from memory', async () => {
-  knownIssue('MONEY-03');
   expect(prompt).toMatch(/only (the )?numbers?[^.]*(in|from) the input/i);
   expect(prompt).toMatch(/studentaid\.gov/i);
 });
 
 test('MONEY-03 the prompt\'s examples carry no interest rate the model could copy onto someone else\'s offer', async () => {
-  knownIssue('MONEY-03');
   expect(prompt).not.toMatch(/\b\d{1,2} to \d{1,2} percent\b/i);
 });
 
 test('MONEY-04 the calibration examples do not forecast the market or call a step certain', async () => {
-  knownIssue('MONEY-04');
   expect(prompt).not.toMatch(/not a sign of a storm/i);
   expect(prompt).not.toMatch(/begin with one broad ETF/i);
 });

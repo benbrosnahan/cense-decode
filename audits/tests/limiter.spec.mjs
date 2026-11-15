@@ -1,11 +1,10 @@
 // The route's in-memory rate limiter (SEC-06 in audits/REPORT.md). It lives in one serverless instance, so it is
 // a brake, not a wall; what matters here is that it cannot grow without bound while it does its job.
-import { test, expect, knownIssue } from './helpers.mjs';
+import { test, expect } from './helpers.mjs';
 
 const load = () => import('../../src/lib/rateLimit.ts');
 
 test('SEC-06 addresses whose minute is over are forgotten, so the limiter does not grow forever', async () => {
-  knownIssue('SEC-06');
   const { RateLimiter } = await load();
   let now = 0;
   const limiter = new RateLimiter({ limit: 5, windowMs: 60_000, maxKeys: 10_000, now: () => now });
@@ -17,7 +16,6 @@ test('SEC-06 addresses whose minute is over are forgotten, so the limiter does n
 });
 
 test('SEC-06 even under a flood of fresh addresses the limiter stays under its cap', async () => {
-  knownIssue('SEC-06');
   const { RateLimiter } = await load();
   const limiter = new RateLimiter({ limit: 5, windowMs: 60_000, maxKeys: 1_000, now: () => 0 });
   for (let i = 0; i < 5_000; i++) limiter.hit(`ip-${i}`);
@@ -25,7 +23,6 @@ test('SEC-06 even under a flood of fresh addresses the limiter stays under its c
 });
 
 test('SEC-06 the sixth hit inside a minute is limited and the minute after is not', async () => {
-  knownIssue('SEC-06');
   const { RateLimiter } = await load();
   let now = 0;
   const limiter = new RateLimiter({ limit: 5, windowMs: 60_000, maxKeys: 100, now: () => now });

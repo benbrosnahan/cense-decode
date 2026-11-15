@@ -1,10 +1,9 @@
 // The signature element, the student's own words marked up, and the product copy rules (UX-01 in audits/REPORT.md).
-import { test, expect, knownIssue, needsMock, decodeText, mainText } from './helpers.mjs';
+import { test, expect, needsMock, decodeText, mainText } from './helpers.mjs';
 import { mockDecode, CARD_DECODE, SCAM_DECODE } from '../lib/decode-fixtures.mjs';
 
 test('UX-01 a term the model rewords ("unsubsidized loan") is still marked where the student wrote it', async ({ page }) => {
   needsMock();
-  knownIssue('UX-01');
   // The same input and the same reworded term came back from the live model on 2026-11-15.
   await decodeText(page, 'What does unsubsidized mean on my student loan? [[mock:terms-reworded]]');
   await expect(page.locator('button.term', { hasText: /^unsubsidized$/i })).toHaveCount(1);

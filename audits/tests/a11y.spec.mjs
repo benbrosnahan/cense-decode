@@ -1,7 +1,7 @@
 // Accessibility: axe's WCAG 2.2 A and AA rules on every screen at phone and desktop width, keyboard use of the
 // marked-up terms, and the Cense floors (13px type, 40px tap targets, 16px inputs). A11Y-01 in audits/REPORT.md.
 import AxeBuilder from '@axe-core/playwright';
-import { test, expect, knownIssue, decodeText, PHONE, DESKTOP } from './helpers.mjs';
+import { test, expect, decodeText, PHONE, DESKTOP } from './helpers.mjs';
 import { mockDecode, CARD_DECODE } from '../lib/decode-fixtures.mjs';
 
 const TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
@@ -27,8 +27,7 @@ const SCREENS = {
 for (const [vpName, viewport] of Object.entries({ phone: PHONE, desktop: DESKTOP })) {
   for (const [name, open] of Object.entries(SCREENS)) {
     test(`axe finds no WCAG A or AA violations on the ${name} screen, ${vpName}`, async ({ page }) => {
-      // The result screen is checked with a term opened, where the white-on-orange highlight measured 4.06:1.
-      if (name === 'result') knownIssue('A11Y-01');
+      // Checked with a term opened: the white-on-orange highlight measured 4.06:1 before A11Y-01 was fixed.
       await page.setViewportSize(viewport);
       await open(page);
       await page.waitForTimeout(400);

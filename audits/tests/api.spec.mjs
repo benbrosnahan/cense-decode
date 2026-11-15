@@ -1,6 +1,6 @@
 // The decode route, /api/decode: who may call it, what it refuses, how it fails, what it lets a cache keep, and
 // what reaches the browser (SEC-03, SEC-04 and SEC-06 in audits/REPORT.md). Nothing here reaches a real model.
-import { test, expect, knownIssue, needsMock, postDecode, freshIp, events, finalOf } from './helpers.mjs';
+import { test, expect, needsMock, postDecode, freshIp, events, finalOf } from './helpers.mjs';
 
 test('a decode streams partial events and then exactly one final event', async ({ request }) => {
   needsMock();
@@ -25,13 +25,11 @@ test('an image of an unsupported type is refused with a plain 400', async ({ req
 });
 
 test('SEC-03 another site cannot post a decode through a visitor\'s browser', async ({ request }) => {
-  knownIssue('SEC-03');
   const res = await postDecode(request, { mode: 'text', text: 'hello' }, { headers: { origin: 'https://someone-else.example' } });
   expect(res.status()).toBe(403);
 });
 
 test('SEC-03 a cross-site text/plain form post, which skips the CORS preflight, is refused', async ({ request }) => {
-  knownIssue('SEC-03');
   const res = await request.post('/api/decode', {
     data: JSON.stringify({ mode: 'text', text: 'hello' }),
     headers: { 'content-type': 'text/plain', origin: 'https://someone-else.example', 'sec-fetch-site': 'cross-site', 'x-forwarded-for': freshIp() },
@@ -47,7 +45,6 @@ test('the page itself can still decode: a same-origin request is accepted', asyn
 });
 
 test('SEC-04 every answer from the route says no-store, so no cache keeps a student\'s document', async ({ request }) => {
-  knownIssue('SEC-04');
   const bad = await postDecode(request, { mode: 'text', text: '' });
   expect(bad.headers()['cache-control'] ?? '').toMatch(/no-store/);
   if (process.env.AUDIT_URL) return;
