@@ -28,10 +28,15 @@ overwhelmed reliably produces zero actions.
   exposed to the client.
 - `src/lib/fallback.ts` is the safe failure. When the model call fails, is cut off, or refuses,
   the page shows an error with Try again, never a made-up result.
-- `src/lib/cues.ts` is the check on the model: scam or urgency wording in the student's words,
-  or in the model's own explanation of a screenshot, can never come back as Low.
-- No accounts, no database, nothing about the user is stored by Cense. Anthropic does not train
-  on API data by default and deletes it within 30 days, unless it is flagged for a safety review.
+- The model is Claude Opus 5.5 (`claude-opus-5-5`) at low effort; `DECODE_MODEL` and
+  `DECODE_EFFORT` override them. It is offered a strict `decode` tool with `tool_choice: auto`
+  (Opus 5.5 refuses a forced tool), and an answer without the tool is asked for once more.
+- `src/lib/cues.ts` is the check on the model: scam wording in the student's words, or in the
+  model's own explanation of a screenshot, always reads Higher with a verify-first step; urgency
+  wording (a late payment, a fee, a clock) can never come back as Low.
+- No accounts, no database, nothing about the user is stored by Cense. What a student sends goes
+  to Anthropic's API, which keeps it for up to 30 days (up to two years if its safety checks flag
+  it) and does not train on it. The page says so above the Decode it button.
 
 ## Design overhaul (2026-09-27)
 
@@ -63,7 +68,7 @@ Branch `audit-redesign`. The findings, fixes and scores are in [audits/REPORT.md
 
 ```bash
 npm run lint && npm run typecheck && npm run build
-cd audits && npm ci && npm run setup && npm test   # 76 Playwright tests, no API key needed
+cd audits && npm ci && npm run setup && npm test   # 94 Playwright tests, no API key needed
 ```
 
 The tests run the real route against a local stand-in for the Anthropic API
