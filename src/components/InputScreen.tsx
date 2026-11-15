@@ -199,7 +199,8 @@ export default function InputScreen({ value, onChange, onSubmit }: Props) {
               Cover account numbers and your Social Security number first.
             </strong>{" "}
             What you send goes to Anthropic&apos;s AI to be read. We do not
-            store it, and it is not used to train AI.
+            keep it. Anthropic does not train on it by default and deletes it
+            within 30 days unless it is flagged for a safety review.
           </p>
         </div>
 

@@ -183,9 +183,10 @@ export default function Home() {
           </p>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
             To decode something, the text or image you submit is sent encrypted
-            to Anthropic&apos;s API. Anthropic may retain it for up to 30 days
-            for safety monitoring, then deletes it. It is never used for AI
-            training. This is a plain-language explainer, not financial advice.
+            to Anthropic&apos;s API. Anthropic does not train on it by default
+            and deletes it within 30 days, unless it is flagged for a safety
+            review, which can keep it up to two years. This is a plain-language
+            explainer, not financial advice.
           </p>
           <p className="mt-2 text-sm text-muted-foreground">
             Built by{" "}

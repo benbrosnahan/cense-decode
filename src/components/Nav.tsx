@@ -24,7 +24,7 @@ export default function Nav() {
         >
           <path d="M8 1.8 13 4v3.6c0 3-2 5.4-5 6.6-3-1.2-5-3.6-5-6.6V4l5-2.2Z" />
         </svg>
-        Nothing stored
+        Nothing saved by us
       </span>
     </header>
   );

@@ -115,9 +115,12 @@
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
 }
+/* Opened: white on the text orange, 5.35:1. The lighter #C1652E measured
+   4.06:1 here, under the 4.5:1 AA minimum. */
 .term:hover,
 .term[aria-pressed="true"] {
-  background: var(--mark-strong);
+  background: var(--brand-orange);
+  border-bottom-color: var(--brand-orange);
   color: #fff;
 }
 
