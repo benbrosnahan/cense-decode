@@ -1,4 +1,4 @@
-// Cense Decode. Created with Claude Code.
+// Cense Decode.
 
 /**
  * Wording that means a decode must never come back calm.

@@ -1,4 +1,4 @@
-// Cense Decode. Created with Claude Code.
+// Cense Decode.
 
 /**
  * Things to try. These are documents, not questions, on purpose: the whole

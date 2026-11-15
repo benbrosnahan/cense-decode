@@ -1,4 +1,4 @@
-// Cense Decode. Created with Claude Code.
+// Cense Decode.
 
 export interface RateLimiterOptions {
   /** Requests allowed per window, per key. */

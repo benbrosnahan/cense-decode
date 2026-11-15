@@ -1,6 +1,6 @@
 "use client";
 
-// Cense Decode. Created with Claude Code.
+// Cense Decode.
 //
 // Your own words, marked up.
 //

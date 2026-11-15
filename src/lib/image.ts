@@ -1,4 +1,4 @@
-// Cense Decode. Created with Claude Code.
+// Cense Decode.
 
 /**
  * Get a screenshot or photo ready to send.

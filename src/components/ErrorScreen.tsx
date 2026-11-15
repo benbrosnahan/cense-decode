@@ -1,6 +1,6 @@
 "use client";
 
-// Cense Decode. Created with Claude Code.
+// Cense Decode.
 
 import { Button } from "@/components/ui/button";
 import { DecodeFailure } from "@/types";

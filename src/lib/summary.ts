@@ -1,4 +1,4 @@
-// Cense Decode. Created with Claude Code.
+// Cense Decode.
 
 import { DecodeResult, WorryLevel } from "@/types";
 
