@@ -1,0 +1,633 @@
+{
+ "url": "http://localhost:3208/",
+ "geoScore": 84,
+ "measurementValid": true,
+ "categories": {
+  "crawlAccess": {
+   "score": 20,
+   "max": 20
+  },
+  "serverContent": {
+   "score": 28,
+   "max": 30
+  },
+  "structuredData": {
+   "score": 16,
+   "max": 20
+  },
+  "socialMeta": {
+   "score": 15,
+   "max": 15
+  },
+  "discovery": {
+   "score": 0,
+   "max": 10
+  },
+  "indexability": {
+   "score": 5,
+   "max": 5
+  }
+ },
+ "contentParity": 100,
+ "ssrWordCount": 163,
+ "csrWordCount": 163,
+ "checks": [
+  {
+   "category": "LLM Crawl Access",
+   "name": "AI Bot Access in robots.txt",
+   "score": 20,
+   "maxScore": 20,
+   "status": "pass",
+   "detail": "14/14 LLM bots allowed (0 blocked)"
+  },
+  {
+   "category": "Server-Side Content",
+   "name": "Title in SSR",
+   "score": 5,
+   "maxScore": 5,
+   "status": "pass",
+   "detail": "\"Decode by Cense\""
+  },
+  {
+   "category": "Server-Side Content",
+   "name": "Meta Description in SSR",
+   "score": 7,
+   "maxScore": 7,
+   "status": "pass",
+   "detail": "\"Paste or screenshot anything money-related that confuses or stresses you. Get a calm, plain-language explanation, whethe\""
+  },
+  {
+   "category": "Server-Side Content",
+   "name": "H1 Tag in SSR",
+   "score": 5,
+   "maxScore": 5,
+   "status": "pass",
+   "detail": "H1 present & matches CSR"
+  },
+  {
+   "category": "Server-Side Content",
+   "name": "Heading Hierarchy",
+   "score": 1,
+   "maxScore": 3,
+   "status": "warn",
+   "detail": "2 headings in SSR (2 in CSR)"
+  },
+  {
+   "category": "Server-Side Content",
+   "name": "Body Text Parity (SSR vs CSR)",
+   "score": 10,
+   "maxScore": 10,
+   "status": "pass",
+   "detail": "SSR matches CSR exactly (163 words, parity 100%) — LLMs see everything users see."
+  },
+  {
+   "category": "Structured Data",
+   "name": "JSON-LD in SSR",
+   "score": 12,
+   "maxScore": 12,
+   "status": "pass",
+   "detail": "1 JSON-LD block(s) in server-rendered HTML"
+  },
+  {
+   "category": "Structured Data",
+   "name": "Rich Schema Types",
+   "score": 4,
+   "maxScore": 8,
+   "status": "warn",
+   "detail": "Types in SSR: WebApplication"
+  },
+  {
+   "category": "Social & Meta Tags",
+   "name": "Open Graph Tags",
+   "score": 7,
+   "maxScore": 7,
+   "status": "pass",
+   "detail": "Complete OG tags (title + description + image)"
+  },
+  {
+   "category": "Social & Meta Tags",
+   "name": "Twitter Card",
+   "score": 4,
+   "maxScore": 4,
+   "status": "pass",
+   "detail": "Card type: summary_large_image"
+  },
+  {
+   "category": "Social & Meta Tags",
+   "name": "Canonical URL",
+   "score": 4,
+   "maxScore": 4,
+   "status": "pass",
+   "detail": "https://cense-decode.vercel.app"
+  },
+  {
+   "category": "LLM Discovery",
+   "name": "llms.txt",
+   "score": 0,
+   "maxScore": 5,
+   "status": "info",
+   "detail": "No /llms.txt — consider adding one for AI crawlers"
+  },
+  {
+   "category": "LLM Discovery",
+   "name": "Markdown Content Negotiation",
+   "score": 0,
+   "maxScore": 3,
+   "status": "info",
+   "detail": "No markdown via content negotiation"
+  },
+  {
+   "category": "LLM Discovery",
+   "name": "AI Plugin / MCP Discovery",
+   "score": 0,
+   "maxScore": 2,
+   "status": "info",
+   "detail": "No AI plugin manifest"
+  },
+  {
+   "category": "Indexability",
+   "name": "Meta Robots",
+   "score": 5,
+   "maxScore": 5,
+   "status": "pass",
+   "detail": "No restrictive meta robots"
+  }
+ ],
+ "recommendations": [
+  {
+   "severity": "low",
+   "title": "Create /llms.txt",
+   "detail": "The llms.txt convention (like robots.txt for AI) provides a structured summary of your site for LLM crawlers. See llmstxt.org for the spec."
+  },
+  {
+   "severity": "low",
+   "title": "Serve markdown via Accept header",
+   "detail": "Some AI crawlers request text/markdown. Serving a markdown version improves content extraction quality. Cloudflare and some CDNs can automate this."
+  }
+ ],
+ "comparison": {
+  "title": {
+   "status": "match",
+   "ssr": "Decode by Cense",
+   "csr": "Decode by Cense"
+  },
+  "description": {
+   "status": "match",
+   "ssr": "Paste or screenshot anything money-related that confuses or stresses you. Get a calm, plain-language explanation, whether you should worry, and one next step.",
+   "csr": "Paste or screenshot anything money-related that confuses or stresses you. Get a calm, plain-language explanation, whether you should worry, and one next step."
+  },
+  "og": [
+   {
+    "key": "og:title",
+    "ssr": "Decode by Cense",
+    "csr": "Decode by Cense",
+    "match": true
+   },
+   {
+    "key": "og:description",
+    "ssr": "Paste or screenshot anything money-related that confuses you. Get a calm, plain-language explanation and one next step.",
+    "csr": "Paste or screenshot anything money-related that confuses you. Get a calm, plain-language explanation and one next step.",
+    "match": true
+   },
+   {
+    "key": "og:url",
+    "ssr": "https://cense-decode.vercel.app",
+    "csr": "https://cense-decode.vercel.app",
+    "match": true
+   },
+   {
+    "key": "og:site_name",
+    "ssr": "Cense",
+    "csr": "Cense",
+    "match": true
+   },
+   {
+    "key": "og:image",
+    "ssr": "https://cense-decode.vercel.app/opengraph-image?e3ba14dacfa9c93f",
+    "csr": "https://cense-decode.vercel.app/opengraph-image?e3ba14dacfa9c93f",
+    "match": true
+   },
+   {
+    "key": "og:image:type",
+    "ssr": "image/png",
+    "csr": "image/png",
+    "match": true
+   },
+   {
+    "key": "og:image:width",
+    "ssr": "1200",
+    "csr": "1200",
+    "match": true
+   },
+   {
+    "key": "og:image:height",
+    "ssr": "630",
+    "csr": "630",
+    "match": true
+   },
+   {
+    "key": "og:image:alt",
+    "ssr": "Decode by Cense: a confusing money message in plain words",
+    "csr": "Decode by Cense: a confusing money message in plain words",
+    "match": true
+   },
+   {
+    "key": "og:type",
+    "ssr": "website",
+    "csr": "website",
+    "match": true
+   }
+  ],
+  "twitter": [
+   {
+    "key": "twitter:card",
+    "ssr": "summary_large_image",
+    "csr": "summary_large_image",
+    "match": true
+   },
+   {
+    "key": "twitter:title",
+    "ssr": "Decode by Cense",
+    "csr": "Decode by Cense",
+    "match": true
+   },
+   {
+    "key": "twitter:description",
+    "ssr": "Paste or screenshot anything money-related that confuses you. Get a calm, plain-language explanation and one next step.",
+    "csr": "Paste or screenshot anything money-related that confuses you. Get a calm, plain-language explanation and one next step.",
+    "match": true
+   },
+   {
+    "key": "twitter:image",
+    "ssr": "https://cense-decode.vercel.app/opengraph-image?e3ba14dacfa9c93f",
+    "csr": "https://cense-decode.vercel.app/opengraph-image?e3ba14dacfa9c93f",
+    "match": true
+   },
+   {
+    "key": "twitter:image:alt",
+    "ssr": "Decode by Cense: a confusing money message in plain words",
+    "csr": "Decode by Cense: a confusing money message in plain words",
+    "match": true
+   },
+   {
+    "key": "twitter:image:type",
+    "ssr": "image/png",
+    "csr": "image/png",
+    "match": true
+   },
+   {
+    "key": "twitter:image:width",
+    "ssr": "1200",
+    "csr": "1200",
+    "match": true
+   },
+   {
+    "key": "twitter:image:height",
+    "ssr": "630",
+    "csr": "630",
+    "match": true
+   }
+  ],
+  "h1": {
+   "status": "match",
+   "ssr": [
+    "Put the confusing money thing here."
+   ],
+   "csr": [
+    "Put the confusing money thing here."
+   ]
+  },
+  "parity": {
+   "ssrWords": 163,
+   "csrWords": 163,
+   "pct": 100,
+   "gapDirection": "even",
+   "ssrChunkCount": 7,
+   "csrChunkCount": 7,
+   "onlyInSSR": [],
+   "onlyInCSR": []
+  },
+  "structuredData": {
+   "ssrTypes": [
+    "WebApplication"
+   ],
+   "csrTypes": [
+    "WebApplication"
+   ],
+   "onlyCSR": [],
+   "onlySSR": [],
+   "match": true
+  },
+  "headingsOnlyCSR": [],
+  "headingsOnlySSR": [],
+  "canonical": {
+   "ssr": "https://cense-decode.vercel.app",
+   "csr": "https://cense-decode.vercel.app"
+  },
+  "robotsMeta": {
+   "ssr": "",
+   "csr": ""
+  },
+  "lang": {
+   "ssr": "en",
+   "csr": "en"
+  }
+ },
+ "robots": {
+  "found": true,
+  "bots": [
+   {
+    "name": "GPTBot",
+    "owner": "OpenAI",
+    "status": "allowed"
+   },
+   {
+    "name": "ChatGPT-User",
+    "owner": "OpenAI",
+    "status": "allowed"
+   },
+   {
+    "name": "ClaudeBot",
+    "owner": "Anthropic",
+    "status": "allowed"
+   },
+   {
+    "name": "anthropic-ai",
+    "owner": "Anthropic",
+    "status": "allowed"
+   },
+   {
+    "name": "CCBot",
+    "owner": "Common Crawl",
+    "status": "allowed"
+   },
+   {
+    "name": "Google-Extended",
+    "owner": "Google",
+    "status": "allowed"
+   },
+   {
+    "name": "GoogleOther",
+    "owner": "Google",
+    "status": "allowed"
+   },
+   {
+    "name": "PerplexityBot",
+    "owner": "Perplexity",
+    "status": "allowed"
+   },
+   {
+    "name": "cohere-ai",
+    "owner": "Cohere",
+    "status": "allowed"
+   },
+   {
+    "name": "Bytespider",
+    "owner": "ByteDance",
+    "status": "allowed"
+   },
+   {
+    "name": "Amazonbot",
+    "owner": "Amazon",
+    "status": "allowed"
+   },
+   {
+    "name": "Meta-ExternalAgent",
+    "owner": "Meta",
+    "status": "allowed"
+   },
+   {
+    "name": "Applebot-Extended",
+    "owner": "Apple",
+    "status": "allowed"
+   },
+   {
+    "name": "Diffbot",
+    "owner": "Diffbot",
+    "status": "allowed"
+   }
+  ]
+ },
+ "discovery": {
+  "llmsTxt": {
+   "found": false
+  },
+  "llmsFullTxt": {
+   "found": false
+  },
+  "markdown": {
+   "served": false,
+   "contentType": "text/html; charset=utf-8"
+  },
+  "aiPlugin": {
+   "found": false
+  }
+ },
+ "metaResult": {
+  "url": "http://localhost:3208/",
+  "tags": [
+   {
+    "name": "title",
+    "content": "Decode by Cense",
+    "status": "good",
+    "recommendation": "Title is 15 chars. Good length."
+   },
+   {
+    "name": "meta description",
+    "content": "Paste or screenshot anything money-related that confuses or stresses you. Get a calm, plain-language explanation, whether you should worry, and one next step.",
+    "status": "good",
+    "recommendation": "Description is 158 chars. Good length."
+   },
+   {
+    "name": "viewport",
+    "content": "width=device-width, initial-scale=1",
+    "status": "good",
+    "recommendation": "Viewport is set."
+   },
+   {
+    "name": "canonical",
+    "content": "https://cense-decode.vercel.app",
+    "status": "good",
+    "recommendation": "Canonical URL: https://cense-decode.vercel.app"
+   },
+   {
+    "name": "og:title",
+    "content": "Decode by Cense",
+    "status": "good",
+    "recommendation": "Set to: Decode by Cense"
+   },
+   {
+    "name": "og:description",
+    "content": "Paste or screenshot anything money-related that confuses you. Get a calm, plain-language explanation and one next step.",
+    "status": "good",
+    "recommendation": "Set to: Paste or screenshot anything money-related that confuses you. Get a calm, plain-..."
+   },
+   {
+    "name": "og:image",
+    "content": "https://cense-decode.vercel.app/opengraph-image?e3ba14dacfa9c93f",
+    "status": "good",
+    "recommendation": "Set to: https://cense-decode.vercel.app/opengraph-image?e3ba14dacfa9c93f"
+   },
+   {
+    "name": "og:url",
+    "content": "https://cense-decode.vercel.app",
+    "status": "good",
+    "recommendation": "Set to: https://cense-decode.vercel.app"
+   },
+   {
+    "name": "og:type",
+    "content": "website",
+    "status": "good",
+    "recommendation": "Set to: website"
+   },
+   {
+    "name": "twitter:card",
+    "content": "summary_large_image",
+    "status": "good",
+    "recommendation": "Set to: summary_large_image"
+   },
+   {
+    "name": "twitter:title",
+    "content": "Decode by Cense",
+    "status": "good",
+    "recommendation": "Set to: Decode by Cense"
+   },
+   {
+    "name": "twitter:description",
+    "content": "Paste or screenshot anything money-related that confuses you. Get a calm, plain-language explanation and one next step.",
+    "status": "good",
+    "recommendation": "Set to: Paste or screenshot anything money-related that confuses you. Get a calm, plain-..."
+   },
+   {
+    "name": "twitter:image",
+    "content": "https://cense-decode.vercel.app/opengraph-image?e3ba14dacfa9c93f",
+    "status": "good",
+    "recommendation": "Set to: https://cense-decode.vercel.app/opengraph-image?e3ba14dacfa9c93f"
+   },
+   {
+    "name": "lang attribute",
+    "content": "en",
+    "status": "good",
+    "recommendation": "Language: en"
+   },
+   {
+    "name": "favicon",
+    "content": "/icon.svg?icon.21i73rao8j1wj.svg",
+    "status": "good",
+    "recommendation": "Favicon found: /icon.svg?icon.21i73rao8j1wj.svg"
+   }
+  ],
+  "preview": {
+   "title": "Decode by Cense",
+   "description": "Paste or screenshot anything money-related that confuses you. Get a calm, plain-language explanation and one next step.",
+   "image": "https://cense-decode.vercel.app/opengraph-image?e3ba14dacfa9c93f",
+   "url": "https://cense-decode.vercel.app",
+   "siteName": "Cense"
+  },
+  "summary": {
+   "good": 15,
+   "warnings": 0,
+   "missing": 0,
+   "total": 15
+  },
+  "score": 100
+ },
+ "structuredDataResult": {
+  "url": "http://localhost:3208/",
+  "totalSchemas": 1,
+  "items": [
+   {
+    "type": "WebApplication",
+    "source": "json-ld",
+    "raw": "{\"@context\":\"https://schema.org\",\"@type\":\"WebApplication\",\"name\":\"Decode by Cense\",\"url\":\"https://cense-decode.vercel.app\",\"description\":\"Paste or screenshot anything money-related that confuses or stresses you. Get a calm, plain-language explanation, whether you should worry, and one next step.\",\"applicationCategory\":\"FinanceApplication\",\"operatingSystem\":\"Any\",\"isAccessibleForFree\":true,\"offers\":{\"@type\":\"Offer\",\"price\":\"0\",\"priceCurrency\":\"USD\"},\"publisher\":{\"@type\":\"Organization\",\"name\":\"Cense\",\"url\":\"https://cense.beehiiv.com\"}}",
+    "parsed": {
+     "@context": "https://schema.org",
+     "@type": "WebApplication",
+     "name": "Decode by Cense",
+     "url": "https://cense-decode.vercel.app",
+     "description": "Paste or screenshot anything money-related that confuses or stresses you. Get a calm, plain-language explanation, whether you should worry, and one next step.",
+     "applicationCategory": "FinanceApplication",
+     "operatingSystem": "Any",
+     "isAccessibleForFree": true,
+     "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+     },
+     "publisher": {
+      "@type": "Organization",
+      "name": "Cense",
+      "url": "https://cense.beehiiv.com"
+     }
+    },
+    "errors": [],
+    "warnings": [
+     "Schema type \"WebApplication\" is valid but not in our validation database. Basic checks only."
+    ],
+    "properties": [
+     {
+      "name": "name",
+      "value": "Decode by Cense",
+      "required": false,
+      "present": true
+     },
+     {
+      "name": "url",
+      "value": "https://cense-decode.vercel.app",
+      "required": false,
+      "present": true
+     },
+     {
+      "name": "description",
+      "value": "Paste or screenshot anything money-related that confuses or stresses you. Get a ...",
+      "required": false,
+      "present": true
+     },
+     {
+      "name": "applicationCategory",
+      "value": "FinanceApplication",
+      "required": false,
+      "present": true
+     },
+     {
+      "name": "operatingSystem",
+      "value": "Any",
+      "required": false,
+      "present": true
+     },
+     {
+      "name": "isAccessibleForFree",
+      "value": "true",
+      "required": false,
+      "present": true
+     },
+     {
+      "name": "offers",
+      "value": "{Offer}",
+      "required": false,
+      "present": true
+     },
+     {
+      "name": "publisher",
+      "value": "{Organization}",
+      "required": false,
+      "present": true
+     }
+    ]
+   }
+  ],
+  "summary": {
+   "total": 1,
+   "valid": 1,
+   "withErrors": 0,
+   "totalErrors": 0,
+   "totalWarnings": 1,
+   "jsonLd": 1,
+   "microdata": 0
+  },
+  "richResultEligibility": {
+   "eligible": false,
+   "types": []
+  }
+ }
+}
