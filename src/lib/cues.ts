@@ -13,8 +13,11 @@
  * - Federal Student Aid, never pay for help: https://studentaid.gov/resources/scams
  *
  * Patterns match word stems on purpose ("gift cards", "cryptocurrency",
- * "wired"). A false alarm costs a "Moderate" instead of a "Low"; a miss can
- * cost the student real money.
+ * "wired"). Scam wording reads Higher whatever the model said (see
+ * normalize.ts), so a false alarm costs a "Higher"; a miss can cost the
+ * student real money. Pressure words that ordinary notices also use
+ * ("immediately", "right away") are urgency, not scam, so a loan explanation
+ * that says interest starts immediately is not called a scam.
  */
 const SCAM = [
   String.raw`gift ?cards?`,
@@ -30,8 +33,7 @@ const SCAM = [
   String.raw`claim\b[^.\n]{0,40}\b(?:refund|prize|reward|money|funds|payment)`,
   String.raw`guaranteed (?:returns?|profits?|income)`,
   String.raw`(?:upfront|up-front|processing|release|activation|unlock) fees?`,
-  String.raw`act now|urgent(?:ly)?|immediately|right away`,
-  String.raw`suspend\w*|frozen|freez\w*|locked`,
+  String.raw`suspend\w*|frozen|freez\w*|locked out|(?:account|card) (?:is |has been |will be )?locked`,
 ];
 
 /** Wording that means money is at stake soon: a late payment, a fee, a clock. */
@@ -41,6 +43,7 @@ const URGENCY = [
   String.raw`due (?:today|tomorrow|now|immediately)`,
   String.raw`within \d+ (?:hours?|days?)|in \d+ hours?`,
   String.raw`expires? (?:today|soon|in)|before it expires`,
+  String.raw`act now|urgent(?:ly)?|immediately|right away`,
 ];
 
 const whole = (parts: string[]) =>
@@ -54,6 +57,10 @@ const FEE_RE = /\bfees?\b/i;
 /** Words only the model's own explanation uses when it has seen a scam. */
 const MODEL_SAYS_SCAM_RE = /\b(?:scam\w*|phishing|impersonat\w*|fraudster\w*)\b/i;
 
+/** "This is not a scam" and the like, so a model that rules a scam out is not read as calling one. */
+const RULED_OUT_RE =
+  /\b(?:not|isn't|is not|no|no signs? of|nothing suggests|does ?n[o']t look like|does not look like)\s+(?:an?\s+|like\s+an?\s+)?(?:scam\w*|phishing|fraud\w*)/gi;
+
 export type Cue = "scam" | "urgency";
 
 /** Which kinds of cue a piece of text carries, scam first. */
@@ -63,7 +70,7 @@ export function cuesIn(text: string, { fromModel = false } = {}): Cue[] {
   if (
     SCAM_RE.test(text) ||
     (FORGIVENESS_RE.test(text) && FEE_RE.test(text)) ||
-    (fromModel && MODEL_SAYS_SCAM_RE.test(text))
+    (fromModel && MODEL_SAYS_SCAM_RE.test(text.replace(RULED_OUT_RE, "")))
   ) {
     found.push("scam");
   }

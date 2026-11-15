@@ -15,21 +15,43 @@ import { test, expect, needsMock, decodeText, urgencyWord, urgencyHeadline, post
 
 const MODEL_GREEN_HEADLINE = 'Nothing here to act on, you can relax.';
 
-const SCAM_AND_URGENCY = [
+// Scam wording, as the FTC and Federal Student Aid describe the signs. Ben's call, 2026-11-15: these read Higher
+// whatever the model said, with the verify-first step and no other tool offered.
+const SCAM = [
   ['gift cards, plural', 'To release your tax refund, buy two $100 gift cards and text me the codes on the back.'],
   ['a payment app', 'Send the $400 deposit by Zelle today to hold the apartment. Other students are interested.'],
   ['crypto by name', 'Pay the $150 processing fee in Bitcoin to unlock your account.'],
   ['suspicious activity and a login link', 'We noticed suspicious activity on your account. Confirm your login details at the link below.'],
   ['a freeze threat with a clock', 'Your card will be frozen in 24 hours unless you call 1-800-555-0100.'],
-  ['a late payment and a fee', 'Your payment is 30 days past due and a $35 late fee has been charged to your account.'],
   ['paid help with loan forgiveness', 'Pay a one-time $299 fee and our team will get your student loans forgiven in 30 days.'],
   ['a refund to claim', 'Click here to claim your $500 government refund before it expires.'],
-  ['a final notice', 'FINAL NOTICE: your balance will be sent to collections.'],
   ['a wire request', 'Wire the remaining tuition balance to the account below by Friday.'],
 ];
 
-for (const [name, text] of SCAM_AND_URGENCY) {
-  test(`MONEY-01 scam or urgency wording never comes back calm: ${name}`, async ({ page }) => {
+// Money at stake soon, from a real lender or collector as often as a scammer (CFPB). Never Low; Moderate is enough.
+const URGENCY = [
+  ['a late payment and a fee', 'Your payment is 30 days past due and a $35 late fee has been charged to your account.'],
+  ['a final notice', 'FINAL NOTICE: your balance will be sent to collections.'],
+];
+
+// The verify-first step the prompt gives the model for red, written out here rather than imported.
+const VERIFY_STEP = 'Do not act on this yet. Verify it directly with your bank or the real company before doing anything.';
+
+for (const [name, text] of SCAM) {
+  for (const [said, marker] of [['Low', 'green'], ['Moderate', 'ok']]) {
+    test(`MONEY-06 scam wording reads Higher when the model said ${said}: ${name}`, async ({ page }) => {
+      needsMock();
+      await decodeText(page, `${text} [[mock:${marker}]]`);
+      expect(await urgencyWord(page)).toBe('Higher');
+      expect(await urgencyHeadline(page)).not.toBe(MODEL_GREEN_HEADLINE);
+      await expect(page.getByText(VERIFY_STEP)).toBeVisible();
+      await expect(page.getByRole('link', { name: /another free cense tool/i })).toHaveCount(0);
+    });
+  }
+}
+
+for (const [name, text] of URGENCY) {
+  test(`MONEY-01 urgency wording never comes back calm: ${name}`, async ({ page }) => {
     needsMock();
     await decodeText(page, `${text} [[mock:green]]`);
     expect(await urgencyWord(page)).not.toBe('Low');
@@ -38,9 +60,21 @@ for (const [name, text] of SCAM_AND_URGENCY) {
   });
 }
 
-test('MONEY-01 a screenshot is checked too: the model\'s own explanation of a gift card demand is never calm', async ({ request }) => {
+test('MONEY-06 a model that rules a scam out is not read as calling one: a card offer "not a scam" stays Moderate', async ({ page }) => {
   needsMock();
-  // A 1x1 white PNG. The server never reads the pixels, only what the model says about them.
+  await decodeText(page, 'Get 3% cash back on dining with no annual fee. [[mock:yellow-not-a-scam]]');
+  expect(await urgencyWord(page)).toBe('Moderate');
+});
+
+test('MONEY-06 "immediately" in an ordinary explanation is not scam wording', async ({ page }) => {
+  needsMock();
+  // Direct Unsubsidized Loans: interest accrues from disbursement (studentaid.gov). A Moderate read stays Moderate.
+  await decodeText(page, 'Interest on this unsubsidized loan begins to accrue immediately after disbursement. [[mock:ok]]');
+  expect(await urgencyWord(page)).toBe('Moderate');
+});
+
+test('MONEY-06 a screenshot the model explains as a gift card demand reads Higher, with the verify-first step', async ({ request }) => {
+  needsMock();
   const png = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==';
   const res = await postDecode(request, {
     mode: 'image',
@@ -49,7 +83,9 @@ test('MONEY-01 a screenshot is checked too: the model\'s own explanation of a gi
   });
   const final = finalOf(await res.text());
   expect(final.failure).toBeUndefined();
-  expect(final.worry.level).not.toBe('green');
+  expect(final.worry.level).toBe('red');
+  expect(final.nextStep).toBe(VERIFY_STEP);
+  expect(final.goDeeper).toBeUndefined();
 });
 
 test('the clamp does not fire on ordinary words: a plain question the model calls calm stays calm', async ({ page }) => {

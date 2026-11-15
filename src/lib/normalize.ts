@@ -22,9 +22,21 @@ const DEFAULT_HEADLINES: Record<WorryLevel, string> = {
   red: "Slow down and verify this before doing anything.",
 };
 
-/** Shown when the server lifts a "green" the model should not have given. */
-const LIFTED_HEADLINE =
-  "Some of this wording often shows up in scams or urgent money requests. Check it with the real company before you act.";
+/** Shown when the server lifts a read because of scam wording. */
+const SCAM_HEADLINE =
+  "Some of this wording often shows up in scams. Check it with the real company before you act.";
+
+/** Shown when the server lifts a "green" because of a late payment, a fee or a clock. */
+const URGENCY_HEADLINE =
+  "Some of this wording often shows up in urgent money requests. Check it with the real company before you act.";
+
+/**
+ * The one next step on a read the server lifted to red for scam wording. The
+ * prompt gives the model the same step for red; the model wrote its own step
+ * for a calmer read, which would contradict "Higher".
+ */
+export const VERIFY_STEP =
+  "Do not act on this yet. Verify it directly with your bank or the real company before doing anything.";
 
 const LIFT_REASON: Record<Cue, string> = {
   scam: "Contains wording often seen in scams, such as a request for gift cards, a wire, a payment app or your login.",
@@ -53,22 +65,32 @@ function modelWords(worry: Partial<WorryRead>, extra: ModelText): string {
   return parts.join("\n");
 }
 
+/** The worry read as the client sees it, and whether the server raised it for scam wording. */
+interface Clamped {
+  read: WorryRead;
+  liftedForScam: boolean;
+}
+
 /**
- * Validate the model's worry read and apply the scam and urgency clamp: an
- * out-of-enum level becomes yellow, and a "green" is lifted to yellow when
- * either the student's words or the model's own explanation carry scam or
- * urgency wording. The model's explanation is checked too because for a
- * screenshot the server never sees the words, only what the model says about
- * them. A lifted read gets a headline that does not tell anyone to relax.
+ * Validate the model's worry read and apply the scam and urgency clamp.
+ *
+ * - An out-of-enum level becomes yellow.
+ * - Scam wording, in the student's words or the model's own explanation,
+ *   means Higher (red) whatever the model said. Ben's call, 2026-11-15: the
+ *   floor was Moderate, and a student shown Moderate for a gift card demand
+ *   may still pay it. The cost is that a definition question such as "what is
+ *   a wire transfer?" also reads Higher.
+ * - Urgency wording alone (a late payment, a fee, a clock) lifts a green to
+ *   yellow (Moderate), as before.
+ *
+ * The model's explanation is checked too because for a screenshot the server
+ * never sees the words, only what the model says about them. A lifted read
+ * gets a headline that does not tell anyone to relax.
  *
  * This is the only place a worry level is produced for the client, for both
  * streamed partials and the final result.
  */
-export function normalizeWorry(
-  raw: unknown,
-  sourceText: string,
-  extra: ModelText = {}
-): WorryRead {
+function clampWorry(raw: unknown, sourceText: string, extra: ModelText = {}): Clamped {
   const w = (raw && typeof raw === "object" ? raw : {}) as Partial<WorryRead>;
 
   const rawLevel = String(w.level ?? "").toLowerCase() as WorryLevel;
@@ -81,21 +103,35 @@ export function normalizeWorry(
       ? w.headline
       : DEFAULT_HEADLINES[level];
 
-  if (level === "green") {
+  if (level !== "red") {
     const cues = new Set([
       ...cuesIn(sourceText),
       ...cuesIn(modelWords(w, extra), { fromModel: true }),
     ]);
-    if (cues.size > 0) {
+    const reasons = [...cues].map((c) => LIFT_REASON[c]);
+    if (cues.has("scam")) {
       return {
-        level: "yellow",
-        headline: LIFTED_HEADLINE,
-        basedOn: [...basedOn, ...[...cues].map((c) => LIFT_REASON[c])],
+        read: { level: "red", headline: SCAM_HEADLINE, basedOn: [...basedOn, ...reasons] },
+        liftedForScam: true,
+      };
+    }
+    if (level === "green" && cues.has("urgency")) {
+      return {
+        read: { level: "yellow", headline: URGENCY_HEADLINE, basedOn: [...basedOn, ...reasons] },
+        liftedForScam: false,
       };
     }
   }
 
-  return { level, headline, basedOn };
+  return { read: { level, headline, basedOn }, liftedForScam: false };
+}
+
+export function normalizeWorry(
+  raw: unknown,
+  sourceText: string,
+  extra: ModelText = {}
+): WorryRead {
+  return clampWorry(raw, sourceText, extra).read;
 }
 
 const nonEmpty = (v: unknown): v is string => typeof v === "string" && v.trim() !== "";
@@ -138,7 +174,10 @@ export function normalizeResult(raw: unknown, sourceText: string): DecodeResult 
     : [];
   const jargon = cleanJargon(r.jargon);
 
-  const read = normalizeWorry(worry, sourceText, { plainLanguage: r.plainLanguage, jargon });
+  const { read, liftedForScam } = clampWorry(worry, sourceText, {
+    plainLanguage: r.plainLanguage,
+    jargon,
+  });
 
   // Derive the deeper-tool suggestion deterministically from the model's topic
   // classification (a required enum, far more reliable than an optional object).
@@ -155,8 +194,9 @@ export function normalizeResult(raw: unknown, sourceText: string): DecodeResult 
     analogy: nonEmpty(r.analogy) ? r.analogy : "",
     worry: read,
     jargon,
-    nextStep: r.nextStep as string,
-    considerations: considerations.length > 0 ? considerations : undefined,
+    nextStep: liftedForScam ? VERIFY_STEP : (r.nextStep as string),
+    // A lifted read is treated as a scam: nothing to weigh, only to verify.
+    considerations: considerations.length > 0 && !liftedForScam ? considerations : undefined,
     goDeeper,
     disclaimer: nonEmpty(r.disclaimer) ? r.disclaimer : fallback.disclaimer,
   };
@@ -178,11 +218,14 @@ export function buildPartial(src: PartialObject, sourceText: string): PartialDec
   if (typeof v.plainLanguage === "string") out.plainLanguage = v.plainLanguage;
   if (typeof v.analogy === "string") out.analogy = v.analogy;
 
+  let liftedForScam = false;
   if (src.complete.has("worry")) {
-    out.worry = normalizeWorry(v.worry, sourceText, {
+    const clamped = clampWorry(v.worry, sourceText, {
       plainLanguage: v.plainLanguage,
       jargon: v.jargon,
     });
+    out.worry = clamped.read;
+    liftedForScam = clamped.liftedForScam;
   }
 
   if (Array.isArray(v.jargon)) {
@@ -197,9 +240,11 @@ export function buildPartial(src: PartialObject, sourceText: string): PartialDec
     if (items.length > 0 || src.complete.has("jargon")) out.jargon = items;
   }
 
-  if (typeof v.nextStep === "string") out.nextStep = v.nextStep;
+  // Once the read is lifted for scam wording, the model's own step never shows.
+  if (liftedForScam) out.nextStep = VERIFY_STEP;
+  else if (typeof v.nextStep === "string") out.nextStep = v.nextStep;
 
-  if (Array.isArray(v.considerations)) {
+  if (!liftedForScam && Array.isArray(v.considerations)) {
     const items = v.considerations
       .filter((c): c is string => typeof c === "string" && c.trim() !== "")
       .slice(0, 3);
