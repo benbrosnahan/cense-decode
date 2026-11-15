@@ -9,11 +9,7 @@ import type {
 import type { PartialObject } from "./partialJson";
 import { getFallbackDecode } from "./fallback";
 import { ROUTE_TARGETS, TOPIC_TO_ROUTE } from "./routes";
-
-// Cues that should never be served as "green". Belt-and-suspenders on top of
-// the system prompt's red-flag override.
-export const SCAM_PATTERNS =
-  /\b(urgent|immediately|verify your account|claim your refund|wire|gift card|suspended|act now|final notice|wire transfer|routing number|social security|password|crypto|guaranteed returns?)\b/i;
+import { cuesIn, type Cue } from "./cues";
 
 const VALID_LEVELS: WorryLevel[] = ["green", "yellow", "red"];
 
@@ -26,65 +22,138 @@ const DEFAULT_HEADLINES: Record<WorryLevel, string> = {
   red: "Slow down and verify this before doing anything.",
 };
 
-/**
- * Validate the model's worry read and apply the scam clamp: an out-of-enum
- * level becomes yellow, and scam wording in the source can never be "green".
- * This is the only place a worry level is produced for the client, for both
- * streamed partials and the final result.
- */
-export function normalizeWorry(raw: unknown, sourceText: string): WorryRead {
-  const w = (raw && typeof raw === "object" ? raw : {}) as Partial<WorryRead>;
+/** Shown when the server lifts a "green" the model should not have given. */
+const LIFTED_HEADLINE =
+  "Some of this wording often shows up in scams or urgent money requests. Check it with the real company before you act.";
 
-  const rawLevel = String(w.level ?? "").toLowerCase() as WorryLevel;
-  let level: WorryLevel = VALID_LEVELS.includes(rawLevel) ? rawLevel : "yellow";
-  const basedOn = Array.isArray(w.basedOn) ? [...w.basedOn] : [];
+const LIFT_REASON: Record<Cue, string> = {
+  scam: "Contains wording often seen in scams, such as a request for gift cards, a wire, a payment app or your login.",
+  urgency: "Mentions a late payment, a fee, a deadline or a short clock.",
+};
 
-  // Scam clamp: never serve scammy wording as "green".
-  if (SCAM_PATTERNS.test(sourceText) && level === "green") {
-    level = "yellow";
-    basedOn.push(
-      "Contains wording often seen in scams or urgent money requests."
-    );
+/** What the model wrote, for checking against the cue lists. */
+export interface ModelText {
+  plainLanguage?: unknown;
+  jargon?: unknown;
+}
+
+function modelWords(worry: Partial<WorryRead>, extra: ModelText): string {
+  const parts: string[] = [];
+  if (typeof extra.plainLanguage === "string") parts.push(extra.plainLanguage);
+  if (typeof worry.headline === "string") parts.push(worry.headline);
+  if (Array.isArray(worry.basedOn)) {
+    for (const b of worry.basedOn) if (typeof b === "string") parts.push(b);
   }
-
-  return {
-    level,
-    headline: w.headline || DEFAULT_HEADLINES[level],
-    basedOn,
-  };
+  if (Array.isArray(extra.jargon)) {
+    for (const j of extra.jargon) {
+      const term = (j as Partial<JargonTerm> | null)?.term;
+      if (typeof term === "string") parts.push(term);
+    }
+  }
+  return parts.join("\n");
 }
 
 /**
- * Normalize the model output into a guaranteed-valid DecodeResult shape so the
- * UI can never crash on a missing field or an out-of-enum worry level, then
- * apply the scam clamp (never downgrade worry; force at least yellow on scam
- * wording).
+ * Validate the model's worry read and apply the scam and urgency clamp: an
+ * out-of-enum level becomes yellow, and a "green" is lifted to yellow when
+ * either the student's words or the model's own explanation carry scam or
+ * urgency wording. The model's explanation is checked too because for a
+ * screenshot the server never sees the words, only what the model says about
+ * them. A lifted read gets a headline that does not tell anyone to relax.
+ *
+ * This is the only place a worry level is produced for the client, for both
+ * streamed partials and the final result.
+ */
+export function normalizeWorry(
+  raw: unknown,
+  sourceText: string,
+  extra: ModelText = {}
+): WorryRead {
+  const w = (raw && typeof raw === "object" ? raw : {}) as Partial<WorryRead>;
+
+  const rawLevel = String(w.level ?? "").toLowerCase() as WorryLevel;
+  const level: WorryLevel = VALID_LEVELS.includes(rawLevel) ? rawLevel : "yellow";
+  const basedOn = Array.isArray(w.basedOn)
+    ? w.basedOn.filter((b): b is string => typeof b === "string" && b.trim() !== "")
+    : [];
+  const headline =
+    typeof w.headline === "string" && w.headline.trim()
+      ? w.headline
+      : DEFAULT_HEADLINES[level];
+
+  if (level === "green") {
+    const cues = new Set([
+      ...cuesIn(sourceText),
+      ...cuesIn(modelWords(w, extra), { fromModel: true }),
+    ]);
+    if (cues.size > 0) {
+      return {
+        level: "yellow",
+        headline: LIFTED_HEADLINE,
+        basedOn: [...basedOn, ...[...cues].map((c) => LIFT_REASON[c])],
+      };
+    }
+  }
+
+  return { level, headline, basedOn };
+}
+
+const nonEmpty = (v: unknown): v is string => typeof v === "string" && v.trim() !== "";
+
+function cleanJargon(raw: unknown): JargonTerm[] {
+  if (!Array.isArray(raw)) return [];
+  const out: JargonTerm[] = [];
+  for (const j of raw) {
+    const { term, definition } = (j ?? {}) as Partial<JargonTerm>;
+    if (nonEmpty(term)) out.push({ term, definition: nonEmpty(definition) ? definition : "" });
+  }
+  return out;
+}
+
+/**
+ * Turn the model's finished tool input into a DecodeResult, or into the safe
+ * fallback when it is not finished.
+ *
+ * The tool schema is strict, so a complete answer always carries the plain
+ * explanation, a valid urgency read and a next step. If any of them is
+ * missing, the answer was cut off (the token cap, a refusal, a dropped
+ * stream), and a half answer is never dressed up as a whole one: the client
+ * shows it as a failure with a retry. Before 2026-11-15 the gaps were filled
+ * with placeholder text and a default "nothing here is urgent".
  */
 export function normalizeResult(raw: unknown, sourceText: string): DecodeResult {
-  const r = (raw ?? {}) as Partial<DecodeResult>;
-  const fallback = getFallbackDecode();
+  const r = (raw ?? {}) as Partial<DecodeResult> & { topic?: Topic };
+  const worry = (r.worry ?? {}) as Partial<WorryRead>;
 
+  const complete =
+    nonEmpty(r.plainLanguage) &&
+    nonEmpty(r.nextStep) &&
+    VALID_LEVELS.includes(worry.level as WorryLevel) &&
+    nonEmpty(worry.headline);
+  if (!complete) return getFallbackDecode();
+
+  const fallback = getFallbackDecode();
   const considerations = Array.isArray(r.considerations)
-    ? r.considerations.filter((c) => typeof c === "string" && c.trim()).slice(0, 3)
+    ? r.considerations.filter(nonEmpty).slice(0, 3)
     : [];
+  const jargon = cleanJargon(r.jargon);
 
   // Derive the deeper-tool suggestion deterministically from the model's topic
   // classification (a required enum, far more reliable than an optional object).
-  const topic = (r as { topic?: Topic }).topic;
-  const route = topic ? TOPIC_TO_ROUTE[topic] : null;
+  const route = r.topic ? TOPIC_TO_ROUTE[r.topic] ?? null : null;
   const goDeeper = route
     ? { route, label: ROUTE_TARGETS[route].defaultLabel }
     : undefined;
 
   return {
-    plainLanguage: r.plainLanguage || fallback.plainLanguage,
-    analogy: r.analogy || fallback.analogy,
-    worry: normalizeWorry(r.worry, sourceText),
-    jargon: Array.isArray(r.jargon) ? r.jargon : [],
-    nextStep: r.nextStep || fallback.nextStep,
+    plainLanguage: r.plainLanguage as string,
+    analogy: nonEmpty(r.analogy) ? r.analogy : "",
+    worry: normalizeWorry(worry, sourceText, { plainLanguage: r.plainLanguage, jargon }),
+    jargon,
+    nextStep: r.nextStep as string,
     considerations: considerations.length > 0 ? considerations : undefined,
     goDeeper,
-    disclaimer: r.disclaimer || fallback.disclaimer,
+    disclaimer: nonEmpty(r.disclaimer) ? r.disclaimer : fallback.disclaimer,
   };
 }
 
@@ -93,8 +162,8 @@ export function normalizeResult(raw: unknown, sourceText: string): DecodeResult 
  *
  * Text fields are passed through as they grow. The worry read is withheld
  * until its object has fully closed in the stream, and then goes through the
- * same normalizeWorry (and scam clamp) as the final result, so a half-written
- * or unclamped level can never reach the user. topic, goDeeper and disclaimer
+ * same normalizeWorry (and clamp) as the final result, so a half-written or
+ * unclamped level can never reach the user. topic, goDeeper and disclaimer
  * are never included; they arrive with the final event.
  */
 export function buildPartial(src: PartialObject, sourceText: string): PartialDecode {
@@ -105,7 +174,10 @@ export function buildPartial(src: PartialObject, sourceText: string): PartialDec
   if (typeof v.analogy === "string") out.analogy = v.analogy;
 
   if (src.complete.has("worry")) {
-    out.worry = normalizeWorry(v.worry, sourceText);
+    out.worry = normalizeWorry(v.worry, sourceText, {
+      plainLanguage: v.plainLanguage,
+      jargon: v.jargon,
+    });
   }
 
   if (Array.isArray(v.jargon)) {

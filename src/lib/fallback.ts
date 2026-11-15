@@ -24,24 +24,3 @@ export function getFallbackDecode(): DecodeResult {
     failure: "unavailable",
   };
 }
-
-/**
- * Shown when the API rate-limits the request (HTTP 429). Nothing was analyzed,
- * so it stays conservative, but it tells the student exactly what to do.
- */
-export function getRateLimitedDecode(): DecodeResult {
-  return {
-    ...getFallbackDecode(),
-    plainLanguage:
-      "Lots of decodes came in from your network in the last minute, so we paused for a moment. Nothing is wrong with what you pasted.",
-    analogy:
-      "Think of it like a busy coffee counter. Your order is fine; the line just needs a minute to clear.",
-    worry: {
-      level: "yellow",
-      headline: "Nothing was analyzed yet, so hold off on acting until you try again.",
-      basedOn: ["Too many requests arrived in the last minute."],
-    },
-    nextStep: "Wait about a minute, then tap Decode again.",
-    failure: "rate-limited",
-  };
-}
