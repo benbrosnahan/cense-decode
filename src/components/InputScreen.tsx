@@ -14,6 +14,10 @@ interface Props {
   onSubmit: () => void;
 }
 
+/** Anthropic's privacy center: how long API data is kept. */
+export const ANTHROPIC_PRIVACY =
+  "https://privacy.claude.com/en/articles/7996866-how-long-do-you-store-my-organization-s-data";
+
 /** The API reads the first 4,000 characters. Say so before it matters. */
 const MAX_CHARS = 4000;
 const WARN_AT = 3500;
@@ -192,15 +196,26 @@ export default function InputScreen({ value, onChange, onSubmit }: Props) {
               that worries you near the top.
             </p>
           )}
-          {/* Said here, at the moment of handing something over, not only in
-              a footer nobody reaches. */}
+          {/* Said here, before the student presses Decode it, not only in a
+              footer nobody reaches. Anthropic's terms for API customers,
+              checked 2026-11-15: inputs and outputs are deleted within 30
+              days (up to two years if a safety system flags them) and are not
+              used for training by default. */}
           <p className="text-sm leading-relaxed text-muted-foreground">
             <strong className="font-semibold text-foreground">
               Cover account numbers and your Social Security number first.
             </strong>{" "}
-            Anthropic&apos;s AI reads what you send. Anthropic does not train
-            on it by default and deletes it within 30 days unless it is flagged
-            for a safety review.
+            What you send goes to Anthropic&apos;s API so its AI can read it.
+            Anthropic keeps it for up to 30 days, longer only if its safety
+            checks flag it, and does not train its AI on it.{" "}
+            <a
+              href={ANTHROPIC_PRIVACY}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-primary underline underline-offset-2 hover:no-underline"
+            >
+              Anthropic&apos;s data terms
+            </a>
           </p>
         </div>
 

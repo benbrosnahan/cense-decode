@@ -16,22 +16,6 @@ export default function Nav() {
         </a>
         <span className="text-foreground">Decode</span>
       </nav>
-      <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-secondary px-3 py-1.5 text-xs font-semibold text-foreground">
-        <svg
-          aria-hidden
-          viewBox="0 0 16 16"
-          // Dropped below 360px so the badge fits beside the name at 320px.
-          className="h-3.5 w-3.5 flex-shrink-0 max-[359px]:hidden"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={1.6}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M8 1.8 13 4v3.6c0 3-2 5.4-5 6.6-3-1.2-5-3.6-5-6.6V4l5-2.2Z" />
-        </svg>
-        Nothing saved by us
-      </span>
     </header>
   );
 }

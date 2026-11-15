@@ -25,29 +25,47 @@ test('SEC-01 the API route carries the same headers', async ({ request }) => {
   expect(h['x-content-type-options']).toBe('nosniff');
 });
 
-// Anthropic's published terms, checked 2026-11-15: API inputs and outputs are not used for training by default
-// and are deleted within 30 days, except content flagged by trust and safety systems, which can be kept up to two
-// years. https://privacy.claude.com/en/articles/7996866-how-long-do-you-store-my-organization-s-data and
+// Anthropic's published terms for API customers, opened 2026-11-15: inputs and outputs are deleted within 30 days
+// of receipt (dated July 1, 2026), except that content flagged by its trust and safety systems can be kept up to two
+// years; inputs and outputs from commercial products, the API among them, are not used for training by default
+// (updated August 18, 2026). Decode sends no feedback and has no opt-in.
+// https://privacy.claude.com/en/articles/7996866-how-long-do-you-store-my-organization-s-data and
 // https://privacy.claude.com/en/articles/7996868-is-my-data-used-for-model-training
 test('SEC-02 the privacy footer matches Anthropic\'s terms: no "never", the 30 days and the safety-review exception named', async ({ page }) => {
   await page.goto('/');
   const footer = (await page.locator('footer').innerText()).replace(/\s+/g, ' ');
   expect(footer).not.toMatch(/never used for (AI )?training/i);
-  expect(footer).toMatch(/by default/i);
+  expect(footer).toMatch(/does not train/i);
   expect(footer).toMatch(/within 30 days/i);
-  expect(footer).toMatch(/flagged/i);
+  expect(footer).toMatch(/two years if its safety checks flag it/i);
 });
 
-test('SEC-02 the note beside the input does not promise more than the footer', async ({ page }) => {
-  await page.goto('/');
-  const help = (await page.locator('#source-help').innerText()).replace(/\s+/g, ' ');
-  expect(help).not.toMatch(/not used to train AI\./i);
-  expect(help).toMatch(/by default/i);
+test('PRIV-01 before sending, the page says plainly that what is sent goes to Anthropic\'s API, is kept up to 30 days and is not trained on, and links Anthropic\'s terms', async ({ page }) => {
+  for (const size of [{ width: 375, height: 812 }, { width: 1440, height: 900 }]) {
+    await page.setViewportSize(size);
+    await page.goto('/');
+    const help = page.locator('#source-help');
+    const text = (await help.innerText()).replace(/\s+/g, ' ');
+    expect(text).toMatch(/goes to Anthropic's API/i);
+    expect(text).toMatch(/up to 30 days/i);
+    expect(text).toMatch(/does not train/i);
+    // Flagged content can be kept longer; the note must not promise 30 days flat.
+    expect(text).toMatch(/longer only if its safety checks flag it/i);
+    const link = help.getByRole('link', { name: /anthropic's data terms/i });
+    await expect(link).toHaveAttribute('href', 'https://privacy.claude.com/en/articles/7996866-how-long-do-you-store-my-organization-s-data');
+    await expect(link).toHaveAttribute('rel', /noopener/);
+    // Seen before sending: the note sits above the Decode it button and is on screen with it.
+    const noteBox = await help.boundingBox();
+    const buttonBox = await page.getByRole('button', { name: /decode it/i }).boundingBox();
+    expect(noteBox.y + noteBox.height).toBeLessThanOrEqual(buttonBox.y);
+    await expect(help).toBeInViewport();
+  }
 });
 
-test('SEC-02 the header badge claims only what Cense controls', async ({ page }) => {
+test('PRIV-01 the header carries no privacy badge', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('header')).not.toContainText('Nothing stored');
+  await expect(page.locator('header')).not.toContainText(/nothing (saved|stored)/i);
+  expect((await page.locator('header').innerText()).replace(/\s+/g, ' ').trim()).toBe('Cense Decode');
 });
 
 test('SEC-05 Next.js is on a release with the 2026 security fixes (16.4.6 or later)', async () => {
