@@ -17,22 +17,28 @@ export function SkeletonLine({ className }: { className?: string }) {
   );
 }
 
-/** Small caps label above a section. */
+/**
+ * Small caps label above a section. On the results screen it is the
+ * section's heading (h2, or h3 inside a section), so a screen reader can
+ * jump between "How urgent this is", "In plain words" and the rest.
+ */
 export function Eyebrow({
   children,
   className,
+  as: Tag = "p",
 }: {
   children: React.ReactNode;
   className?: string;
+  as?: "p" | "h2" | "h3";
 }) {
   return (
-    <p
+    <Tag
       className={cn(
         "text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground",
         className
       )}
     >
       {children}
-    </p>
+    </Tag>
   );
 }

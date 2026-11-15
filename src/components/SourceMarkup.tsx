@@ -49,7 +49,7 @@ export default function SourceMarkup({ source, jargon, streaming }: Props) {
       aria-label="Your words, decoded"
       className="rounded-3xl bg-card p-5 card-soft ring-1 ring-border sm:p-7"
     >
-      <Eyebrow>
+      <Eyebrow as="h2">
         {!source.image && marked ? "Your words, marked up" : "What you sent"}
       </Eyebrow>
 
@@ -147,7 +147,7 @@ export default function SourceMarkup({ source, jargon, streaming }: Props) {
 
       {(terms.length > 0 || (streaming && !jargon)) && (
         <div className="mt-5 border-t border-border pt-4">
-          <Eyebrow>
+          <Eyebrow as="h3">
             {terms.length === 1 ? "The term, defined" : "Every term, defined"}
           </Eyebrow>
           <dl className="mt-2 flex flex-col divide-y divide-border">

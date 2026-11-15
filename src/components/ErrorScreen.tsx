@@ -52,7 +52,7 @@ export default function ErrorScreen({ failure, onRetry, onEdit }: Props) {
       </div>
 
       <div className="rounded-3xl bg-secondary p-5">
-        <Eyebrow>If it cannot wait</Eyebrow>
+        <Eyebrow as="h2">If it cannot wait</Eyebrow>
         <p className="mt-1.5 text-base leading-relaxed text-foreground">
           Do not act on a message you do not understand. Contact the company
           using the phone number on the back of your card or on its official

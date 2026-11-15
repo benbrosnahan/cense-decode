@@ -19,7 +19,7 @@ export default function PlainLanguageCard({
 }: Props) {
   return (
     <section aria-label="In plain words" className="px-1">
-      <Eyebrow>In plain words</Eyebrow>
+      <Eyebrow as="h2">In plain words</Eyebrow>
       {plainLanguage ? (
         <p className="mt-2 text-pretty text-lg leading-relaxed text-foreground sm:text-xl sm:leading-relaxed">
           {plainLanguage}
@@ -36,7 +36,7 @@ export default function PlainLanguageCard({
 
       {analogy ? (
         <div className="mt-5 rounded-2xl bg-secondary p-4 sm:p-5">
-          <Eyebrow>Think of it like this</Eyebrow>
+          <Eyebrow as="h3">Think of it like this</Eyebrow>
           <p className="mt-1.5 text-pretty text-base leading-relaxed text-foreground">
             {analogy}
           </p>

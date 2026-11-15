@@ -86,3 +86,14 @@ test('the urgency level is never carried by colour alone: the word and the step 
   await decodeText(page, 'Anything at all.');
   await expect(page.locator('[aria-label^="Moderate, step 2 of 3"]')).toHaveCount(1);
 });
+
+test('A11Y-02 the results read as an outline: one h1, then a heading for each block, under a Cense nav landmark', async ({ page }) => {
+  await mockDecode(page, CARD_DECODE);
+  await decodeText(page, '0% intro APR for 15 months, then a variable APR. No annual fee.');
+  await expect(page.locator('h1')).toHaveCount(1);
+  const h2 = (await page.locator('main h2').allInnerTexts()).map(t => t.toLowerCase());
+  for (const name of ['how urgent this is', 'in plain words', 'do this next', 'your words, marked up']) {
+    expect(h2, name).toContain(name);
+  }
+  await expect(page.getByRole('navigation', { name: 'Cense' })).toHaveCount(1);
+});

@@ -35,9 +35,9 @@ export default function NextStepCard({
       aria-label="Do this next"
       className="rounded-3xl bg-primary p-5 text-primary-foreground card-lift sm:p-7"
     >
-      <p className="text-xs font-semibold uppercase tracking-[0.08em] text-white/80">
+      <h2 className="text-xs font-semibold uppercase tracking-[0.08em] text-white/80">
         Do this next
-      </p>
+      </h2>
       {nextStep ? (
         <p className="mt-2 text-pretty font-display text-xl font-bold leading-snug sm:text-2xl">
           {nextStep}
@@ -65,9 +65,9 @@ export default function NextStepCard({
 
       {considerations && considerations.length > 0 && (
         <div className="mt-5 border-t border-white/25 pt-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.08em] text-white/80">
+          <h3 className="text-xs font-semibold uppercase tracking-[0.08em] text-white/80">
             Before you decide
-          </p>
+          </h3>
           <ul className="mt-2 flex flex-col gap-2">
             {considerations.map((c, i) => (
               <li

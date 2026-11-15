@@ -33,7 +33,7 @@ export default function WorryMeter({ worry }: Props) {
       aria-label="How urgent this is"
       className="rounded-3xl bg-card p-5 card-soft ring-1 ring-border sm:p-7"
     >
-      <Eyebrow>How urgent this is</Eyebrow>
+      <Eyebrow as="h2">How urgent this is</Eyebrow>
 
       <div
         className="mt-3"
@@ -86,7 +86,7 @@ export default function WorryMeter({ worry }: Props) {
 
       {cues.length > 0 && (
         <div className="mt-5 border-t border-border pt-4">
-          <Eyebrow>What we saw that says so</Eyebrow>
+          <Eyebrow as="h3">What we saw that says so</Eyebrow>
           <ul className="mt-2 flex flex-col gap-1.5">
             {cues.map((cue, i) => (
               <li

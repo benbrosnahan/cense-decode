@@ -50,6 +50,7 @@ export default function ResultsScreen({
 
   return (
     <div className="flex flex-col gap-5 pt-6" aria-busy={streaming}>
+      <h1 className="sr-only">Your decode</h1>
       <div className="flex min-h-11 items-center justify-between gap-3">
         <Button variant="ghost" size="sm" className="-ml-3" onClick={onDecodeAnother}>
           <svg

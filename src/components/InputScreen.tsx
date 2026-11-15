@@ -198,9 +198,9 @@ export default function InputScreen({ value, onChange, onSubmit }: Props) {
             <strong className="font-semibold text-foreground">
               Cover account numbers and your Social Security number first.
             </strong>{" "}
-            What you send goes to Anthropic&apos;s AI to be read. We do not
-            keep it. Anthropic does not train on it by default and deletes it
-            within 30 days unless it is flagged for a safety review.
+            Anthropic&apos;s AI reads what you send. Anthropic does not train
+            on it by default and deletes it within 30 days unless it is flagged
+            for a safety review.
           </p>
         </div>
 
@@ -211,9 +211,9 @@ export default function InputScreen({ value, onChange, onSubmit }: Props) {
 
       {!image && !text && (
         <div className="flex flex-col gap-2.5">
-          <p className="px-1 text-sm font-semibold text-foreground">
+          <h2 className="px-1 text-sm font-semibold text-foreground">
             Nothing on hand? Try one of these.
-          </p>
+          </h2>
           <div className="flex flex-wrap gap-2">
             {EXAMPLES.map((ex) => (
               <button
