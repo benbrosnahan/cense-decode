@@ -207,7 +207,7 @@ export default function InputScreen({ value, onChange, onSubmit }: Props) {
             </strong>{" "}
             What you send goes to Anthropic&apos;s API so its AI can read it.
             Anthropic keeps it for up to 30 days, longer only if its safety
-            checks flag it, and does not train its AI on it.{" "}
+            checks flag it, and by default does not train its AI on it.{" "}
             <a
               href={ANTHROPIC_PRIVACY}
               target="_blank"

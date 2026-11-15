@@ -35,7 +35,7 @@ test('SEC-02 the privacy footer matches Anthropic\'s terms: no "never", the 30 d
   await page.goto('/');
   const footer = (await page.locator('footer').innerText()).replace(/\s+/g, ' ');
   expect(footer).not.toMatch(/never used for (AI )?training/i);
-  expect(footer).toMatch(/does not train/i);
+  expect(footer).toMatch(/by default does not train/i);
   expect(footer).toMatch(/within 30 days/i);
   expect(footer).toMatch(/two years if its safety checks flag it/i);
 });
@@ -48,7 +48,7 @@ test('PRIV-01 before sending, the page says plainly that what is sent goes to An
     const text = (await help.innerText()).replace(/\s+/g, ' ');
     expect(text).toMatch(/goes to Anthropic's API/i);
     expect(text).toMatch(/up to 30 days/i);
-    expect(text).toMatch(/does not train/i);
+    expect(text).toMatch(/by default does not train/i);
     // Flagged content can be kept longer; the note must not promise 30 days flat.
     expect(text).toMatch(/longer only if its safety checks flag it/i);
     const link = help.getByRole('link', { name: /anthropic's data terms/i });

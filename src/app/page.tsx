@@ -183,7 +183,7 @@ export default function Home() {
           </p>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
             What you send goes encrypted to Anthropic&apos;s API. Anthropic
-            does not train its AI on it and deletes it within 30 days, or
+            by default does not train its AI on it, and deletes it within 30 days, or
             within two years if its safety checks flag it. A plain-language
             explainer, not financial advice.
           </p>
