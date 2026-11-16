@@ -62,6 +62,10 @@ export const SCENARIOS = {
   'green-reassures-absent': {
     input: { ...GREEN, plainLanguage: 'This is a monthly electric bill for $86.42, due November 24. Last month was paid in full.', worry: { ...GREEN.worry, basedOn: ['Last month was paid in full', 'Nothing in the bill asks you to wire money, use a gift card, or click an unusual link'] } },
   },
+  // Seen live on Opus 5.5, 2026-11-15: a green read whose reasons say what is absent, in urgency and scam words.
+  'green-says-not-past-due': {
+    input: { ...GREEN, plainLanguage: 'This is a routine confirmation that your loan money was paid out. This does not appear to be a scam.', worry: { ...GREEN.worry, basedOn: ['Nothing says the account is past due or in collections'] } },
+  },
   // A yellow card-offer read whose explanation rules a scam out.
   'yellow-not-a-scam': {
     input: { ...GENERIC, plainLanguage: 'This is a normal card offer, not a scam. It pays a little back on dining.', topic: 'credit-card' },

@@ -63,7 +63,7 @@ const RULED_OUT_RE =
 
 export type Cue = "scam" | "urgency";
 
-const NEGATION_RE = /\b(?:no|not|nothing|never|none|neither|nor|without|doesn'?t|does not|don'?t|do not|isn'?t|is not|won'?t|will not)\b/i;
+const NEGATION_RE = /\b(?:no|not|nothing|never|none|neither|nor|without|unlikely|doesn'?t appear|does not appear|doesn'?t|does not|don'?t|do not|isn'?t|is not|won'?t|will not)\b/i;
 
 /** The text with every sentence or list item that contains a negation removed. */
 function withoutNegatedSentences(text: string): string {
@@ -79,15 +79,17 @@ export function cuesIn(text: string, { fromModel = false } = {}): Cue[] {
   const found: Cue[] = [];
   // The model often reassures by naming what is absent ("Nothing here asks you to wire money or use a gift
   // card"). Seen live on Opus 5.5, 2026-11-15: that sentence lifted an ordinary electric bill to Higher. So in
-  // the model's own words, sentences that negate are dropped before the scam list is checked.
-  const scamText = fromModel ? withoutNegatedSentences(text) : text;
+  // the model's own words, sentences that negate are dropped before any list is checked. The same goes for
+  // "Nothing says the account is past due or in collections" (urgency) and "This does not appear to be a
+  // scam" (the model's own scam words), both seen live the same day.
+  const own = fromModel ? withoutNegatedSentences(text) : text;
   if (
-    SCAM_RE.test(scamText) ||
-    (FORGIVENESS_RE.test(text) && FEE_RE.test(text)) ||
-    (fromModel && MODEL_SAYS_SCAM_RE.test(text.replace(RULED_OUT_RE, "")))
+    SCAM_RE.test(own) ||
+    (FORGIVENESS_RE.test(own) && FEE_RE.test(own)) ||
+    (fromModel && MODEL_SAYS_SCAM_RE.test(own.replace(RULED_OUT_RE, "")))
   ) {
     found.push("scam");
   }
-  if (URGENCY_RE.test(text)) found.push("urgency");
+  if (URGENCY_RE.test(own)) found.push("urgency");
   return found;
 }

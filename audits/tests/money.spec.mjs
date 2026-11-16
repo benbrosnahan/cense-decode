@@ -186,3 +186,9 @@ test('MONEY-21 the prompt keeps red for scams and money already at risk, and cal
   // The override still covers the scam signals regulators list.
   for (const cue of ['wire money', 'gift cards', 'verify your account', 'password']) expect(prompt).toContain(cue);
 });
+
+test('MONEY-06 a calm read that says what is absent ("nothing says it is past due", "does not appear to be a scam") stays calm', async ({ page }) => {
+  needsMock();
+  await decodeText(page, 'Your Direct Subsidized Loan of $3,500 has been disbursed. [[mock:green-says-not-past-due]]');
+  expect(await urgencyWord(page)).toBe('Low');
+});
