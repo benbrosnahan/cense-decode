@@ -174,3 +174,15 @@ for (const topic of ['general-finance', 'none']) {
     await expect(page.getByRole('link', { name: /another free cense tool/i })).toHaveCount(0);
   });
 }
+
+test('MONEY-21 the prompt keeps red for scams and money already at risk, and calls an ordinary bill with a due date yellow', () => {
+  // Ben, 2026-11-15: an ordinary electric bill read Higher because the prompt made any deadline or fee red.
+  const prompt = readFileSync(new URL('../../src/lib/prompt.ts', import.meta.url), 'utf8');
+  expect(prompt).not.toMatch(/has a deadline or fees/);
+  expect(prompt).toMatch(/"yellow": worth acting on in time, but routine\. A normal bill with a due date/);
+  expect(prompt).toMatch(/"red": money is at risk now, or it may be a scam/);
+  expect(prompt).toMatch(/past due, in collections, a final notice/);
+  expect(prompt).toMatch(/A due date and a late-fee term on an ordinary bill or statement are not scam signals/);
+  // The override still covers the scam signals regulators list.
+  for (const cue of ['wire money', 'gift cards', 'verify your account', 'password']) expect(prompt).toContain(cue);
+});
