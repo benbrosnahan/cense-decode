@@ -58,6 +58,10 @@ export const SCENARIOS = {
   'green-explains-gift-cards': {
     input: { ...GREEN, plainLanguage: 'This screenshot asks you to pay a fee with Apple gift cards to unlock your refund.' },
   },
+  // Seen live on Opus 5.5, 2026-11-15: a green bill whose reasons reassure by naming what is absent.
+  'green-reassures-absent': {
+    input: { ...GREEN, plainLanguage: 'This is a monthly electric bill for $86.42, due November 24. Last month was paid in full.', worry: { ...GREEN.worry, basedOn: ['Last month was paid in full', 'Nothing in the bill asks you to wire money, use a gift card, or click an unusual link'] } },
+  },
   // A yellow card-offer read whose explanation rules a scam out.
   'yellow-not-a-scam': {
     input: { ...GENERIC, plainLanguage: 'This is a normal card offer, not a scam. It pays a little back on dining.', topic: 'credit-card' },

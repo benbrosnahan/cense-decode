@@ -88,6 +88,13 @@ test('MONEY-06 a screenshot the model explains as a gift card demand reads Highe
   expect(final.goDeeper).toBeUndefined();
 });
 
+test('MONEY-06 a model that reassures by naming what is absent ("nothing asks you to wire money or use a gift card") stays calm', async ({ page }) => {
+  needsMock();
+  // Seen live on Opus 5.5, 2026-11-15: this sentence lifted an ordinary electric bill to Higher.
+  await decodeText(page, 'Eversource electric bill. Amount due $86.42 by Nov 24. Payment received $79.10, thank you. [[mock:green-reassures-absent]]');
+  expect(await urgencyWord(page)).toBe('Low');
+});
+
 test('the clamp does not fire on ordinary words: a plain question the model calls calm stays calm', async ({ page }) => {
   needsMock();
   await decodeText(page, 'What does APR stand for on a credit card statement? [[mock:green]]');

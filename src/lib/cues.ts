@@ -63,12 +63,26 @@ const RULED_OUT_RE =
 
 export type Cue = "scam" | "urgency";
 
+const NEGATION_RE = /\b(?:no|not|nothing|never|none|neither|nor|without|doesn'?t|does not|don'?t|do not|isn'?t|is not|won'?t|will not)\b/i;
+
+/** The text with every sentence or list item that contains a negation removed. */
+function withoutNegatedSentences(text: string): string {
+  return text
+    .split(/(?<=[.!?])\s+|\n+|","|\["|"\]/)
+    .filter(part => !NEGATION_RE.test(part))
+    .join(" ");
+}
+
 /** Which kinds of cue a piece of text carries, scam first. */
 export function cuesIn(text: string, { fromModel = false } = {}): Cue[] {
   if (!text) return [];
   const found: Cue[] = [];
+  // The model often reassures by naming what is absent ("Nothing here asks you to wire money or use a gift
+  // card"). Seen live on Opus 5.5, 2026-11-15: that sentence lifted an ordinary electric bill to Higher. So in
+  // the model's own words, sentences that negate are dropped before the scam list is checked.
+  const scamText = fromModel ? withoutNegatedSentences(text) : text;
   if (
-    SCAM_RE.test(text) ||
+    SCAM_RE.test(scamText) ||
     (FORGIVENESS_RE.test(text) && FEE_RE.test(text)) ||
     (fromModel && MODEL_SAYS_SCAM_RE.test(text.replace(RULED_OUT_RE, "")))
   ) {
