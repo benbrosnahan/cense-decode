@@ -103,3 +103,22 @@ Image mode with a real model (screenshots were tested through the stand-in API o
 
 ## Method
 Read every source file; listed every claim, rule and link; checked them against Anthropic's privacy center and model list, studentaid.gov, the Department of Education, Regulation Z and FTC guidance; one real call on the live site and one through the local build; a cross-site POST to the live route with an empty body to confirm SEC-03 without spending a call; the kit's read-only live scan. The suite was written against intended behavior, run on the unchanged build with known issues shown, then each issue was fixed and its `knownIssue()` removed.
+
+## Follow-ups, 2026-11-15 (deployed the same day)
+
+Ben's answers to "What Ben needs to decide", implemented and deployed:
+
+| ID | Sev | Change | Status | Test |
+|---|---|---|---|---|
+| MODEL-01 | P2 | Model moved from `claude-opus-4-8` to `claude-opus-5-5` (`DECODE_MODEL` still overrides; `DECODE_EFFORT`, default `low`). The tool is offered strict with `tool_choice: {type: "auto"}`, because Opus 5.5 returns a 400 for a forced tool. No thinking field is sent: Opus 5.5 thinking is always on, and it rejects both `disabled` and `between_tools` with a 400 (the first live call failed on `between_tools`; the stand-in API now refuses it too). max_tokens 6144, SDK 1.8.0. If the model answers without the tool, it is asked once more when under 25 s have passed. | Fixed; live check 2026-11-15: a bill, a loan notice and a USPS scam text decoded in 8 to 12 s | api.spec (MODEL-01) |
+| MONEY-06 | P1 | Clamp floor raised. Scam wording in the student's words, or in the model's own explanation, reads Higher when the model said Low or Moderate, with the verify-first next step. Pressure words ordinary notices use ("immediately", "right away", "act now", "urgent") count as urgency, not scam. In the model's own words, sentences that negate ("Nothing here asks you to wire money or use a gift card") are dropped before the scam list is checked: on the first live run that sentence lifted an ordinary electric bill to Higher. | Fixed | money.spec (MONEY-06) |
+| MONEY-05 | P1 | Red results keep no go-deeper link | Unchanged, as decided | money.spec |
+| PRIV-01 | P2 | "Nothing saved by us" badge removed. A plain note above Decode it says what is sent goes to Anthropic's API, is deleted within 30 days (kept up to two years only if safety checks flag it), and by default is not used for training, with a link to Anthropic's privacy center. The footer matches. | Fixed | security-seo.spec (PRIV-01) |
+
+Sources for PRIV-01, opened 2026-11-15:
+- https://privacy.claude.com/en/articles/7996866-how-long-do-you-store-my-organization-s-data
+- https://privacy.claude.com/en/articles/7996868-is-my-data-used-for-model-training
+
+Known cost of the higher floor, accepted by Ben: a definition question such as "what is a wire transfer?" that the model calls calm now reads Higher.
+
+Open, for Ben: the prompt tells the model red means "could cost money, has a deadline or fees, or looks like a scam", so an ordinary bill with a due date and a late fee comes back Higher. This predates the model change.
